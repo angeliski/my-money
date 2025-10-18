@@ -38,3 +38,21 @@
 !/app/assets/builds/.keep
 .playwright-mcp/*
 coverage/*
+
+# Ignore SQLite database files
+*.sqlite3
+*.sqlite3-*
+
+# Ignore test coverage reports
+/coverage/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db

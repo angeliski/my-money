@@ -1,21 +1,27 @@
 <!-- Sync Impact Report
-Version Change: 1.3.0 → 1.4.0
-Modified Principles: None
+Version Change: 1.4.0 → 1.5.0
+Modified Principles:
+- Principle IV: Test-Driven Development → Testing Standards
+  - Removed requirement for tests to be written before implementation (TDD)
+  - Changed to require comprehensive tests completed by delivery time
+  - Maintained coverage and quality standards
+- Principle VIII: Quality Gates and Delivery Standards
+  - Removed TDD workflow reference from quality validation
+  - Clarified tests must pass before delivery (not written first)
+- Development Standards: Code Language Conventions (NEW)
+  - Clarified code must be in English (variables, methods, classes, comments)
+  - User-facing text remains pt-BR via i18n
+  - Routes follow Rails English conventions for REST consistency
 Added Sections:
-- New Principle VIII: Quality Gates and Delivery Standards
-- Mandatory test suite passing requirement (RSpec with documentation format)
-- Mandatory Rubocop linting with auto-fix requirement
-- Mandatory Brakeman security scanning requirement
-- Code coverage maximization requirement
-- bin/check script compliance requirement
+- Code Language Conventions under Development Standards
 Removed Sections: None
 Templates Requiring Updates:
-- .specify/templates/plan-template.md: ✅ Updated (Constitution Check now includes VIII)
-- .specify/templates/tasks-template.md: ✅ Updated (Final phase includes quality gate validation)
-- .specify/templates/spec-template.md: ⚠ No changes needed (quality requirements implicit in success criteria)
+- .specify/templates/plan-template.md: ✅ Updated (Principle IV Constitution Check updated)
+- .specify/templates/tasks-template.md: ✅ Already flexible (mentions tests are optional)
+- .specify/templates/spec-template.md: ✅ No changes needed (spec stays technology-agnostic)
 Follow-up TODOs:
-- Consider defining specific code coverage thresholds in SimpleCov configuration
-- Document bin/check script requirements in development workflow documentation
+- Ensure development team understands testing comes at end, not beginning
+- Clarify in onboarding docs that code language is English despite pt-BR user text
 -->
 
 # MyMoney Constitution
@@ -49,10 +55,27 @@ Turbo and Stimulus handle all interactivity without full page reloads. Server
 rendering maintains SEO and accessibility. WebSocket connections via Turbo Streams
 for live updates. No separate API layer unless external consumers require it.
 
-### IV. Test-Driven Development
-RSpec tests written before implementation. Minimum 80% code coverage maintained.
-Integration tests for critical user paths. Model specs validate business logic.
-Request specs ensure controller behavior. System specs for JavaScript interactions.
+### IV. Testing Standards
+All code MUST have comprehensive test coverage completed before delivery. RSpec
+tests validate all business logic, controller behavior, and user interactions.
+Minimum 80% code coverage maintained across the codebase.
+
+**Testing Requirements**:
+- **Model Specs**: Validate all business logic, validations, associations, and scopes
+- **Request Specs**: Ensure controller actions behave correctly across all HTTP methods
+- **System Specs**: Cover critical user paths with JavaScript interactions via browser automation
+- **Coverage Target**: Minimum 80% code coverage measured by SimpleCov
+- **Delivery Gate**: All tests MUST pass before feature is considered complete
+
+**Test Development Approach**:
+- Tests can be written before, during, or after implementation
+- Tests MUST be comprehensive and complete by delivery time
+- All new code paths MUST have corresponding test coverage
+- Existing tests MUST continue passing (no regressions)
+
+**Rationale**: Comprehensive testing ensures code reliability, facilitates refactoring,
+documents expected behavior, and prevents regressions. The timing of test writing
+is flexible, but test completeness and quality are non-negotiable delivery requirements.
 
 ### V. Domain-Driven Design
 Business logic encapsulated in models and service objects. Controllers remain thin
@@ -76,8 +99,8 @@ document.
 **Rationale**: Automated tests validate code behavior but cannot capture the full
 user experience. Browser testing ensures features work as intended from the user's
 perspective, catches visual regressions, and validates responsive design across
-devices. This human-in-the-loop validation complements TDD and prevents shipping
-features that technically work but deliver poor user experience.
+devices. This human-in-the-loop validation complements automated testing and prevents
+shipping features that technically work but deliver poor user experience.
 
 ### VII. Visual Consistency and Design System
 All user interfaces MUST maintain consistent visual identity across the entire
@@ -128,6 +151,7 @@ without errors or warnings. Code coverage MUST be maximized at all times.
   - Command: `bundle exec rspec --format documentation --color`
   - Zero failures, zero pending specs allowed in deliveries
   - All new code MUST have corresponding test coverage
+  - Tests must be complete before delivery (can be written anytime during development)
 - **Code Quality**: Rubocop linting MUST pass with auto-fix applied
   - Command: `bundle exec rubocop -f github -a`
   - Follow Rails Omakase style guide without exceptions
@@ -141,8 +165,8 @@ without errors or warnings. Code coverage MUST be maximized at all times.
   - SimpleCov reports MUST show comprehensive coverage across all groups
 
 **Quality Validation Workflow**:
-1. Write tests FIRST (TDD - see Principle IV)
-2. Implement feature with maximum test coverage
+1. Implement feature with tests (tests can be written before, during, or after implementation)
+2. Ensure all tests pass and coverage is comprehensive
 3. Run `bin/check` to validate all quality gates
 4. Fix any test failures, linting violations, or security issues
 5. Verify coverage reports show comprehensive testing
@@ -165,6 +189,37 @@ considered complete.
 - **Styling**: Tailwind utilities with mobile-first breakpoints
 - **JavaScript**: Stimulus controllers for progressive enhancement
 - **Browser Testing**: Playwright MCP for manual user acceptance validation
+
+### Code Language Conventions
+
+**Code Language**: English
+- All code MUST be written in English:
+  - Variable names: `user_account`, `total_balance` (not `conta_usuario`, `saldo_total`)
+  - Method names: `calculate_balance`, `process_transaction` (not `calcular_saldo`, `processar_transacao`)
+  - Class names: `BankAccount`, `TransactionProcessor` (not `ContaBancaria`, `ProcessadorTransacao`)
+  - Comments: English explanations of complex logic
+  - Database columns: `created_at`, `user_id` (not `criado_em`, `usuario_id`)
+
+**User-Facing Text**: Portuguese (pt-BR)
+- All text shown to users MUST be in Portuguese via Rails i18n:
+  - View templates: Use `t('key')` for all strings
+  - Flash messages: `t('flash.success')` not hardcoded English
+  - Error messages: Configured in `config/locales/pt-BR.yml`
+  - Email templates: All content in Portuguese
+
+**Routes**: English (Rails Convention)
+- Follow Rails RESTful conventions in English for consistency:
+  - `/accounts` not `/contas` for accounts resource
+  - `/transactions` not `/transacoes` for transactions resource
+  - `/users/sign_in` not `/usuarios/entrar` for Devise routes
+- Standard Rails route helpers: `account_path`, `new_transaction_path`
+
+**Rationale**: English code ensures:
+- Compatibility with international Rails community and gems
+- Consistency with Rails framework conventions and documentation
+- Easier collaboration with English-speaking developers
+- Standard route patterns familiar to all Rails developers
+- Clear separation: code (technical, English) vs. UI (user-facing, pt-BR)
 
 ### Migration Management
 
@@ -214,13 +269,14 @@ Code reviews verify:
 - Rails conventions followed (including generator usage)
 - Mobile viewport tested
 - Hotwire patterns utilized
-- Test coverage maintained
+- Test coverage maintained and comprehensive by delivery
 - Performance budgets met
 - Migration immutability respected
 - Browser testing completed for user-facing features
 - Visual consistency maintained across interfaces
 - Quality gates passed (bin/check succeeds)
+- Code written in English, user text in pt-BR via i18n
 
 Use CLAUDE.md for agent-specific development guidance and operational instructions.
 
-**Version**: 1.4.0 | **Ratified**: 2025-01-28 | **Last Amended**: 2025-10-18
+**Version**: 1.5.0 | **Ratified**: 2025-01-28 | **Last Amended**: 2025-10-18

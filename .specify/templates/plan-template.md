@@ -46,10 +46,11 @@
 - [ ] Stimulus controllers for interactivity
 - [ ] No separate API layer unless justified
 
-**Principle IV: Test-Driven Development**
-- [ ] RSpec tests written before implementation
+**Principle IV: Testing Standards**
+- [ ] Comprehensive test coverage planned (can be written before, during, or after implementation)
 - [ ] Minimum 80% code coverage target
 - [ ] Model, request, and system specs planned
+- [ ] All tests must pass before delivery
 
 **Principle V: Domain-Driven Design**
 - [ ] Business logic in models and service objects

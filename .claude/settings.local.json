@@ -42,7 +42,13 @@
       "Bash(bin/importmap pin:*)",
       "Bash(cat bin/dev)",
       "Bash(cat db/schema.rb)",
-      "Bash(cat .specify/scripts/bash/create-new-feature.sh)"
+      "Bash(cat .specify/scripts/bash/create-new-feature.sh)",
+      "Bash(git rev-parse --git-dir)",
+      "Bash(bundle exec brakeman)",
+      "Bash(bin/check)",
+      "Bash(bundle exec brakeman -q)",
+      "Bash(bundle exec brakeman -I)",
+      "Bash(bundle exec brakeman -f json)"
     ],
     "deny": [],
     "ask": []
