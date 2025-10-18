@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "MyMoney - Login" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-gradient-to-br from-blue-800 via-blue-200 to-indigo-300 text-black">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 mix-blend-multiply"></div>
+      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div class="max-w-md w-full space-y-8">
+        <!-- Logo/Brand -->
+        <div class="text-center">
+          <div class="mx-auto h-24 w-24 flex items-center justify-center">
+            <%= image_tag "icone.svg", alt: "Logo" %>
+          </div>
+          <p class="mt-2 text-sm text-blue-800">
+            Bem Vindo ao MyMoney!
+          </p>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-white/20">
+          <%= yield %>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center">
+          <p class="text-xs text-blue-900">
+            © <%= Date.current.year %> MyMoney. Todos os direitos reservados.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="absolute top-10 left-10 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
+    <div class="absolute top-1/4 right-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl"></div>
+    <div class="absolute bottom-20 left-1/4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+  </body>
+</html>

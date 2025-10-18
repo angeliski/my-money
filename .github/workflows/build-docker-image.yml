@@ -1,0 +1,60 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          COMMIT_SHA=${{ github.sha }}
+          SHORT_SHA=${COMMIT_SHA:0:7}
+          
+          # Build with multiple tags
+          docker build . \
+            -t ghcr.io/$REPO_LOWER/app:$SHORT_SHA
+
+      - name: Push Docker images to GitHub Packages
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          COMMIT_SHA=${{ github.sha }}
+          SHORT_SHA=${COMMIT_SHA:0:7}
+          
+          # Push all tags
+          docker push ghcr.io/$REPO_LOWER/app:$SHORT_SHA
+
+      - name: Update docker-compose.yml with commit SHA
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          COMMIT_SHA=${{ github.sha }}
+          SHORT_SHA=${COMMIT_SHA:0:7}
+          
+          # Update docker-compose.yml with the new SHA
+          sed -i "s|ghcr.io/$REPO_LOWER/app:.*|ghcr.io/$REPO_LOWER/app:$SHORT_SHA|" docker-compose.yml
+          
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Commit and push with [skip ci] to avoid retriggering
+          git add docker-compose.yml
+          git commit -m "chore: update docker image to $SHORT_SHA [skip ci]" || echo "No changes to commit"
+          git push origin main || echo "No changes to push"

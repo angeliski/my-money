@@ -1,0 +1,65 @@
+version: "3.7"
+
+services:
+  my_money:
+    image: ghcr.io/angeliski/my_money/app:dc3a9de
+    environment:
+      - RAILS_ENV=production
+      - RAILS_SERVE_STATIC_FILES=true
+      - RAILS_LOG_TO_STDOUT=true
+    secrets:
+      - source: my_money_database_url
+        target: /run/my_money/database_url
+      - source: my_money_app_url
+        target: /run/my_money/app_url
+      - source: my_money_secret_key_base
+        target: /run/my_money/secret_key_base
+      - source: my_money_mailer_sender
+        target: /run/my_money/mailer_sender
+      - source: my_money_resend_api_key
+        target: /run/my_money/resend_api_key
+    volumes:
+      - my_money_storage:/rails/storage
+      - my_money_log:/rails/log
+    networks:
+      - network_public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.my_money.rule=Host(`money.angeliski.com.br`)
+        - traefik.http.routers.my_money.entrypoints=websecure
+        - traefik.http.routers.my_money.priority=1
+        - traefik.http.routers.my_money.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.my_money.service=my_money
+        - traefik.http.services.my_money.loadbalancer.server.port=3000
+        - traefik.http.services.my_money.loadbalancer.passHostHeader=true
+
+volumes:
+  my_money_storage:
+    external: true
+    name: my_money_storage
+  my_money_log:
+    external: true
+    name: my_money_log
+
+networks:
+  network_public:
+    name: network_public
+    external: true
+
+secrets:
+  my_money_database_url:
+    external: true
+  my_money_app_url:
+    external: true
+  my_money_secret_key_base:
+    external: true
+  my_money_resend_api_key:
+    external: true
+  my_money_mailer_sender:
+    external: true

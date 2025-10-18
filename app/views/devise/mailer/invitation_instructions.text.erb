@@ -1,0 +1,19 @@
+========================================
+BEM-VINDO AO MyMoney
+========================================
+
+<%= t("devise.mailer.invitation_instructions.hello", email: @resource.email) %>
+
+<%= t("devise.mailer.invitation_instructions.someone_invited_you", url: root_url) %>
+
+Para criar sua senha e acessar o sistema, clique no link abaixo:
+
+<%= accept_invitation_url(@resource, invitation_token: @token) %>
+
+----------------------------------------
+
+<%= t("devise.mailer.invitation_instructions.ignore") %>
+
+<%= t("devise.mailer.invitation_instructions.footer") %>
+
+========================================
