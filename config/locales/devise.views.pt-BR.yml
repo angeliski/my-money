@@ -1,0 +1,42 @@
+pt-BR:
+  activerecord:
+    models:
+      user: 
+        one: Usuário
+        many: Usuários
+        other: Usuários
+  devise:
+    failure:
+      invited: 'Você tem um convite pendente, aceite para finalizar sua conta.'
+    invitations:
+      send_instructions: 'Um email de convite foi enviado para %{email}.'
+      invitation_token_invalid: 'O código do convite não é válido!'
+      updated: 'Sua senha foi atualizada com sucesso. Você está autenticado agora.'
+      no_invitations_remaining: "Sem convites pendentes"
+      invitation_removed: 'Seu convite foi removido.'
+      new:
+        header: "Enviar convite"
+        submit_button: "Enviar um convite"
+      edit:
+        header: "Escolha sua senha"
+        submit_button: "Atualizar minha senha"
+    mailer:
+      invitation_instructions:
+        subject: 'Você foi convidado para o MyMoney!'
+        hello: 'Olá %{email}!'
+        welcome: 'Bem-vindo ao MyMoney'
+        someone_invited_you: 'Você recebeu um convite para fazer parte da nossa plataforma. Clique no botão abaixo para criar sua senha e começar a usar o sistema.'
+        accept: 'Criar Minha Senha'
+        accept_until: 'Este convite é válido até %{due_date}.'
+        ignore: "Se você não solicitou este convite, pode ignorar este e-mail com segurança. Sua conta só será criada após você definir sua senha."
+        footer: 'Equipe MyMoney'
+    shared:
+      minimum_password_length:
+        one: "(mínimo de %{count} caractere)"
+        other: "(mínimo de %{count} caracteres)"
+  errors:
+    messages:
+      not_saved:
+        one: '1 erro impediu que este(a) %{resource} fosse salvo(a):'
+        other: "%{count} erros impediram que este(a) %{resource} fosse salvo(a):"
+        

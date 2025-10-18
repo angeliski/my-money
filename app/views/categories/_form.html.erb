@@ -1,0 +1,22 @@
+<%= form_with(model: category, class: "contents") do |form| %>
+  <% if category.errors.any? %>
+    <div id="error_explanation" class="bg-red-900/30 text-red-400 px-3 py-2 font-medium rounded-md mt-3 ring-1 ring-inset ring-red-600/40">
+      <h2><%= pluralize(category.errors.count, "error") %> prohibited this category from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% category.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :name, class: "block text-sm font-medium text-gray-400" %>
+    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full bg-slate-700 text-white", {"border-slate-600 focus:ring-2 focus:ring-cyan-500": category.errors[:name].none?, "border-red-400 focus:ring-2 focus:ring-red-500": category.errors[:name].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

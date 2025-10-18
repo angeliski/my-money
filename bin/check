@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+bin/bundle exec rspec --format documentation --color
+bin/rubocop -f github -a
+bin/brakeman --no-pager 

@@ -1,0 +1,10 @@
+pt-BR:
+  time:
+    formats:
+      long: "%d/%m/%Y %H:%M"
+      default: "%d/%m/%Y"
+      short: "%d/%m"
+      devise:
+        mailer:
+          invitation_instructions:
+            accept_until_format: "%d/%m/%Y %H:%M"

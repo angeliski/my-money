@@ -1,0 +1,126 @@
+<% if current_user.admin_role? || current_user.operator_supervisor_role? %>
+  <!-- Dashboard for Admin and Supervisor -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-white">Dashboard</h1>
+    <p class="text-gray-400 mt-2">
+      Bem-vindo, <%= current_user.name || current_user.email %>!
+      <span class="font-semibold">(<%= current_user.role.humanize %>)</span>
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-12 md:gap-6">
+    <!-- Quick Access Cards -->
+    <% if current_user.admin_role? %>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-6 sm:col-span-6 xl:col-span-3">
+        <%= link_to users_path, class: "block hover:text-cyan-400" do %>
+          <dl>
+            <dt class="text-2xl font-bold text-white"><%= User.count %></dt>
+            <dd class="text-sm font-medium text-gray-400">Usuários Cadastrados</dd>
+          </dl>
+        <% end %>
+      </div>
+
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-6 sm:col-span-6 xl:col-span-3">
+        <%= link_to root_path, class: "block hover:text-cyan-400" do %>
+          <dl>
+            <dt class="text-2xl font-bold text-white">0</dt>
+            <dd class="text-sm font-medium text-gray-400">Terminais</dd>
+          </dl>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if current_user.admin_role? %>
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-6 sm:col-span-6 xl:col-span-3">
+        <%= link_to root_path, class: "block hover:text-cyan-400" do %>
+          <dl>
+            <dt class="text-2xl font-bold text-white">0</dt>
+            <dd class="text-sm font-medium text-gray-400">Métodos de Pagamento Ativos</dd>
+          </dl>
+        <% end %>
+      </div>
+
+      <div class="rounded-lg border border-slate-700 bg-slate-800 p-6 sm:col-span-6 xl:col-span-3">
+        <%= link_to root_path, class: "block hover:text-cyan-400" do %>
+          <dl>
+            <dt class="text-2xl font-bold text-white">Analytics</dt>
+            <dd class="text-sm font-medium text-gray-400">Dashboard e Relatórios</dd>
+          </dl>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Quick Actions -->
+    <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-800 sm:col-span-12">
+      <div class="px-6 pt-6">
+        <h2 class="text-2xl font-bold text-white">Ações Rápidas</h2>
+        <h3 class="text-sm font-medium text-gray-400">
+          Acesse rapidamente as funcionalidades disponíveis para sua role
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% if current_user.admin_role? %>
+            <%= link_to new_user_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Convidar Novo Usuário</h3>
+              <p class="text-sm text-gray-400 mt-1">Adicione um novo operador ao sistema</p>
+            <% end %>
+
+            <%= link_to root_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Gerenciar Terminais</h3>
+              <p class="text-sm text-gray-400 mt-1">Configure e gerencie os terminais do sistema</p>
+            <% end %>
+          <% end %>
+
+          <% if current_user.admin_role? %>
+            <%= link_to root_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Métodos de Pagamento</h3>
+              <p class="text-sm text-gray-400 mt-1">Configure formas de pagamento aceitas</p>
+            <% end %>
+
+            <%= link_to root_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Dashboard Analítico</h3>
+              <p class="text-sm text-gray-400 mt-1">Visualize métricas e relatórios do sistema</p>
+            <% end %>
+
+            <%= link_to root_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Relatórios Financeiros</h3>
+              <p class="text-sm text-gray-400 mt-1">Análise de vendas e recargas</p>
+            <% end %>
+
+            <%= link_to root_path, class: "block p-4 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-cyan-600 transition" do %>
+              <h3 class="font-semibold text-white">Relatórios de Estoque</h3>
+              <p class="text-sm text-gray-400 mt-1">Análise de estoque e velocidade</p>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-800 sm:col-span-12">
+      <div class="px-6 pt-6">
+        <h2 class="text-2xl font-bold text-white">Atividade Recente</h2>
+        <h3 class="text-sm font-medium text-gray-400">
+          Últimas transações e atividades no sistema
+        </h3>
+      </div>
+      <div class="p-6">
+          <p class="text-gray-400">Nenhuma transação registrada ainda.</p>
+      </div>
+    </div>
+  </div>
+
+<% else %>
+  <!-- For other roles without terminals assigned -->
+  <div class="rounded-lg border border-yellow-700 bg-yellow-900/30 p-6">
+    <h2 class="text-xl font-semibold text-yellow-300 mb-2">Nenhum Terminal Atribuído</h2>
+    <p class="text-yellow-300">
+      Você não possui nenhum terminal atribuído no momento.
+      Entre em contato com seu supervisor para ser designado a um terminal.
+    </p>
+    <p class="text-yellow-300 mt-2">
+      <strong>Sua role:</strong> <%= current_user.role.humanize %>
+    </p>
+  </div>
+<% end %>
