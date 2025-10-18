@@ -31,7 +31,45 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Principle I: Rails Convention over Configuration**
+- [ ] Using Rails generators for all models, migrations, controllers
+- [ ] Following RESTful routing patterns
+- [ ] Leveraging ActiveRecord patterns appropriately
+
+**Principle II: Mobile-First Progressive Enhancement**
+- [ ] Mobile viewport (320px minimum) designed first
+- [ ] Touch-friendly interfaces
+- [ ] Progressive enhancement to desktop
+
+**Principle III: Hotwire-Powered Real-time UX**
+- [ ] Using Turbo for navigation without full page reloads
+- [ ] Stimulus controllers for interactivity
+- [ ] No separate API layer unless justified
+
+**Principle IV: Test-Driven Development**
+- [ ] RSpec tests written before implementation
+- [ ] Minimum 80% code coverage target
+- [ ] Model, request, and system specs planned
+
+**Principle V: Domain-Driven Design**
+- [ ] Business logic in models and service objects
+- [ ] Thin controllers
+- [ ] Clear domain boundaries
+
+**Principle VI: User Acceptance Validation via Browser Testing**
+- [ ] Playwright MCP testing planned for user stories
+- [ ] Desktop and mobile viewport validation
+- [ ] User story validation checklist prepared
+
+**Principle VII: Visual Consistency and Design System**
+- [ ] Using standardized Tailwind slate dark theme colors
+- [ ] Following existing component patterns
+- [ ] Responsive design validation planned
+
+**Principle VIII: Quality Gates and Delivery Standards**
+- [ ] bin/check compliance planned (RSpec, Rubocop, Brakeman)
+- [ ] Maximum test coverage strategy defined
+- [ ] Quality gate validation in final phase
 
 ## Project Structure
 

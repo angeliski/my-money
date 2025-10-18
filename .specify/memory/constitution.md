@@ -1,20 +1,21 @@
 <!-- Sync Impact Report
-Version Change: 1.2.0 → 1.3.0
+Version Change: 1.3.0 → 1.4.0
 Modified Principles: None
 Added Sections:
-- New Principle VII: Visual Consistency and Design System
-- Standardized color palette requirement (slate-900 dark theme)
-- Component design consistency across all interfaces
-- Responsive design validation requirements
+- New Principle VIII: Quality Gates and Delivery Standards
+- Mandatory test suite passing requirement (RSpec with documentation format)
+- Mandatory Rubocop linting with auto-fix requirement
+- Mandatory Brakeman security scanning requirement
+- Code coverage maximization requirement
+- bin/check script compliance requirement
 Removed Sections: None
 Templates Requiring Updates:
-- .specify/templates/plan-template.md: ✅ Updated (Constitution Check now includes VII)
-- .specify/templates/tasks-template.md: ✅ Updated (Phase 3.5 includes visual consistency validation)
-- .specify/templates/spec-template.md: ⚠ No changes needed (visual requirements covered in acceptance scenarios)
-- CLAUDE.md: ⚠ Pending manual update (add visual consistency note in Development Notes)
+- .specify/templates/plan-template.md: ✅ Updated (Constitution Check now includes VIII)
+- .specify/templates/tasks-template.md: ✅ Updated (Final phase includes quality gate validation)
+- .specify/templates/spec-template.md: ⚠ No changes needed (quality requirements implicit in success criteria)
 Follow-up TODOs:
-- Consider documenting color palette in separate design system file
-- Add visual regression testing to CI/CD pipeline
+- Consider defining specific code coverage thresholds in SimpleCov configuration
+- Document bin/check script requirements in development workflow documentation
 -->
 
 # MyMoney Constitution
@@ -117,6 +118,44 @@ efficiently, reduces development time through reusable patterns, and maintains
 professional presentation across all features. Visual consistency is a core quality
 attribute, not a cosmetic afterthought.
 
+### VIII. Quality Gates and Delivery Standards
+All implementations MUST pass mandatory quality gates before delivery. The
+`bin/check` script defines the complete quality validation suite and MUST pass
+without errors or warnings. Code coverage MUST be maximized at all times.
+
+**Mandatory Quality Gates**:
+- **Test Suite**: All RSpec tests MUST pass with documentation format output
+  - Command: `bundle exec rspec --format documentation --color`
+  - Zero failures, zero pending specs allowed in deliveries
+  - All new code MUST have corresponding test coverage
+- **Code Quality**: Rubocop linting MUST pass with auto-fix applied
+  - Command: `bundle exec rubocop -f github -a`
+  - Follow Rails Omakase style guide without exceptions
+  - All violations MUST be resolved before delivery
+- **Security Scanning**: Brakeman security analysis MUST report zero vulnerabilities
+  - Command: `bundle exec brakeman --no-pager`
+  - All security warnings MUST be addressed or explicitly justified
+- **Code Coverage**: Test coverage MUST be maximized
+  - Strive for highest possible coverage on all code paths
+  - New features MUST NOT decrease overall coverage percentage
+  - SimpleCov reports MUST show comprehensive coverage across all groups
+
+**Quality Validation Workflow**:
+1. Write tests FIRST (TDD - see Principle IV)
+2. Implement feature with maximum test coverage
+3. Run `bin/check` to validate all quality gates
+4. Fix any test failures, linting violations, or security issues
+5. Verify coverage reports show comprehensive testing
+6. Only mark implementation complete when `bin/check` passes cleanly
+
+**Rationale**: Quality gates prevent technical debt accumulation and ensure
+maintainable, secure, well-tested code. The `bin/check` script provides a
+single command to validate all quality requirements, enabling fast feedback
+and preventing broken code from reaching production. Maximum test coverage
+ensures code reliability, facilitates refactoring, and documents expected
+behavior. These gates are non-negotiable - code that doesn't pass is not
+considered complete.
+
 ## Development Standards
 
 ### Technology Stack
@@ -180,7 +219,8 @@ Code reviews verify:
 - Migration immutability respected
 - Browser testing completed for user-facing features
 - Visual consistency maintained across interfaces
+- Quality gates passed (bin/check succeeds)
 
 Use CLAUDE.md for agent-specific development guidance and operational instructions.
 
-**Version**: 1.3.0 | **Ratified**: 2025-01-28 | **Last Amended**: 2025-10-07
+**Version**: 1.4.0 | **Ratified**: 2025-01-28 | **Last Amended**: 2025-10-18

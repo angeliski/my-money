@@ -153,6 +153,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
+- [ ] TXXX Quality Gate Validation: Run bin/check and ensure all gates pass (RSpec, Rubocop, Brakeman)
+- [ ] TXXX Verify maximum test coverage achieved across all code paths
 
 ---
 
