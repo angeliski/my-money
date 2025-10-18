@@ -41,7 +41,8 @@
       "Bash(bundle list:*)",
       "Bash(bin/importmap pin:*)",
       "Bash(cat bin/dev)",
-      "Bash(cat db/schema.rb)"
+      "Bash(cat db/schema.rb)",
+      "Bash(cat .specify/scripts/bash/create-new-feature.sh)"
     ],
     "deny": [],
     "ask": []

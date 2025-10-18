@@ -11,19 +11,72 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Pessoas que desejam ter visibilidade sobre gastos e investimentos
 - Usuários com conhecimento básico a intermediário em finanças
 
-### 1.3 Proposta de Valor
+### 1.3 Modelo de Compartilhamento Familiar
+**Conceito**: O aplicativo é projetado para uso compartilhado entre membros de uma mesma família.
+
+**Características:**
+- **Dados Compartilhados**: Múltiplos usuários têm acesso ao mesmo conjunto de dados financeiros
+- **Colaboração**: Todos os membros da família podem visualizar e gerenciar contas, transações e investimentos
+- **Sincronização**: Alterações feitas por qualquer membro são refletidas instantaneamente para todos
+- **Visão Unificada**: Consolidação das finanças familiares em um único ambiente
+
+**Implicações:**
+- Necessário sistema de permissões e papéis (admin/membro)
+- Auditoria de alterações para rastreabilidade
+- Considerações de privacidade e segurança entre membros
+
+### 1.4 Proposta de Valor
 - **Simplicidade**: Interface intuitiva e fluxos descomplicados
 - **Visibilidade**: Dashboards e relatórios visuais sobre a saúde financeira
 - **Organização**: Categorização e recorrências automatizadas
 - **Acompanhamento**: Evolução de investimentos simplificada
+- **Colaboração**: Gestão financeira compartilhada entre membros da família
 
 ---
 
 ## 2. Funcionalidades Core
 
-### 2.1 Gestão de Contas
+### 2.1 Gestão de Usuários e Família
 
-#### 2.1.1 Cadastro de Contas
+#### 2.1.1 Conceito de Família
+**Descrição**: Uma "família" representa um grupo de usuários que compartilham o mesmo conjunto de dados financeiros.
+
+**Características:**
+- Cada usuário pertence a uma única família
+- Todos os dados (contas, transações, categorias, investimentos) pertencem à família, não a usuários individuais
+- Membros da família têm acesso completo aos mesmos dados financeiros
+
+#### 2.1.2 Papéis e Permissões
+**Tipos de usuário:**
+1. **Administrador**:
+   - Pode convidar novos membros para a família
+   - Pode gerenciar permissões de outros usuários
+   - Pode remover membros (exceto a si mesmo se for o último admin)
+   - Acesso completo a todas as funcionalidades
+
+2. **Membro**:
+   - Acesso completo a visualização e edição de dados financeiros
+   - Não pode gerenciar outros usuários
+   - Não pode alterar permissões
+
+**Regras:**
+- Primeiro usuário que cria a conta se torna automaticamente administrador
+- Deve haver pelo menos um administrador ativo na família
+- Sistema de convites via email para novos membros
+
+#### 2.1.3 Auditoria e Rastreabilidade
+**Funcionalidades:**
+- Registro de quem criou/editou cada transação
+- Histórico de alterações em registros importantes
+- Log de ações administrativas (convites, mudanças de permissão)
+
+**Objetivo:** Transparência e rastreabilidade das ações dentro do ambiente familiar compartilhado.
+
+---
+
+### 2.2 Gestão de Contas
+
+#### 2.2.1 Cadastro de Contas
 **Descrição**: Permite criar e gerenciar diferentes contas financeiras.
 
 **Campos obrigatórios:**
@@ -44,7 +97,7 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Saldo inicial não entra no cálculo de receitas/despesas dos relatórios
 - Ícone e cor são definidos automaticamente pelo tipo de conta
 
-#### 2.1.2 Visualização de Contas
+#### 2.2.2 Visualização de Contas
 - Lista de contas com saldo atual
 - Indicador visual de saldo positivo/negativo
 - Acesso rápido às transações de cada conta
@@ -52,9 +105,9 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 
 ---
 
-### 2.2 Gestão de Transações
+### 2.3 Gestão de Transações
 
-#### 2.2.1 Cadastro de Transações
+#### 2.3.1 Cadastro de Transações
 **Descrição**: Permite registrar receitas e despesas.
 
 **Campos obrigatórios:**
@@ -73,7 +126,7 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
    - Data de término (opcional - se vazio, recorrência indefinida)
    - Opção de editar: **apenas transações futuras (ainda não efetivadas)**
 
-#### 2.2.2 Regras de Transações Recorrentes
+#### 2.3.2 Regras de Transações Recorrentes
 - **Transações recorrentes são templates** que geram automaticamente transações futuras
 - Sistema cria automaticamente as transações futuras (até 12 meses à frente)
 - Uma vez que a transação é efetivada (data chegou), ela se torna independente e não pode mais ser editada pelo template
@@ -82,7 +135,7 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Possibilidade de marcar como paga/recebida
 - Objetivo: facilitar o dia a dia e ter uma projeção simples da gestão financeira
 
-#### 2.2.3 Listagem de Transações
+#### 2.3.3 Listagem de Transações
 **Funcionalidades:**
 - Ordenação por data (padrão: mais recentes primeiro)
 - Filtros:
@@ -96,9 +149,9 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 
 ---
 
-### 2.3 Categorias
+### 2.4 Categorias
 
-#### 2.3.1 Categorias Pré-definidas (Seed inicial da conta)
+#### 2.4.1 Categorias Pré-definidas (Seed inicial da família)
 
 **Despesas:**
 - 🏠 Moradia (aluguel, condomínio, IPTU)
@@ -120,9 +173,9 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - 🎁 Presentes/Bonificações
 - 💵 Outros
 
-**Observação:** Estas categorias são criadas automaticamente quando o usuário cria sua conta pela primeira vez (seed).
+**Observação:** Estas categorias são criadas automaticamente quando a família é criada pela primeira vez (seed), sendo compartilhadas por todos os membros.
 
-#### 2.3.2 Gestão de Categorias
+#### 2.4.2 Gestão de Categorias
 - Criar categorias customizadas
 - Editar nome e ícone de categorias
 - Arquivar categorias (não excluir para manter histórico)
@@ -130,9 +183,9 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 
 ---
 
-### 2.4 Conta de Investimentos
+### 2.5 Conta de Investimentos
 
-#### 2.4.1 Funcionalidades Específicas
+#### 2.5.1 Funcionalidades Específicas
 **Descrição**: Acompanhamento simplificado de investimentos sem integração com corretoras.
 
 **Tipos de movimentação:**
@@ -152,7 +205,7 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Rendimentos não afetam outras contas (são ganhos)
 - Histórico completo de movimentações
 
-#### 2.4.2 Dashboard de Investimentos
+#### 2.5.2 Dashboard de Investimentos
 - Card visual com informações principais
 - Gráfico de evolução do saldo
 - Separação visual: Aportado vs Rendimentos
@@ -160,9 +213,9 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 
 ---
 
-### 2.5 Relatórios e Dashboards
+### 2.6 Relatórios e Dashboards
 
-#### 2.5.1 Dashboard Principal (Home)
+#### 2.6.1 Dashboard Principal (Home)
 **Elementos:**
 - Saldo total consolidado
 - Resumo do mês atual:
@@ -173,7 +226,7 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Próximas contas a vencer
 - Acesso rápido para nova transação
 
-#### 2.5.2 Relatórios Detalhados
+#### 2.6.2 Relatórios Detalhados
 **Tela de Relatórios com:**
 
 1. **Visão Geral**
@@ -247,8 +300,12 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 ## 8. Critérios de Aceite do MVP
 
 - ✅ Usuário consegue criar conta e fazer login
+- ✅ Primeiro usuário se torna automaticamente administrador da família
+- ✅ Administrador consegue convidar outros membros para a família
+- ✅ Múltiplos usuários da mesma família acessam os mesmos dados financeiros
+- ✅ Sistema registra qual usuário criou/editou cada transação (auditoria básica)
 - ✅ Usuário consegue cadastrar múltiplas contas financeiras (Corrente e Investimentos)
-- ✅ Sistema cria automaticamente categorias pré-definidas no primeiro acesso
+- ✅ Sistema cria automaticamente categorias pré-definidas quando a família é criada
 - ✅ Usuário consegue adicionar transações pontuais e recorrentes
 - ✅ Transações recorrentes funcionam como templates que geram transações futuras
 - ✅ Edição de templates recorrentes afeta apenas transações futuras não efetivadas
