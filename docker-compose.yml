@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   my_money:
-    image: ghcr.io/angeliski/my_money/app:dc3a9de
+    image: ghcr.io/angeliski/my-money/app:dc3a9de
     environment:
       - RAILS_ENV=production
       - RAILS_SERVE_STATIC_FILES=true
