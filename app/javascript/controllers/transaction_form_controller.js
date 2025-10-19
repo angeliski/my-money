@@ -1,4 +1,4 @@
-import { Controller } from "@hotwire/stimulus"
+import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["recurringFields", "recurringOptions"]
@@ -19,7 +19,7 @@ export default class extends Controller {
     const checkbox = this.element.querySelector('[name="transaction[is_template]"]')
 
     if (this.hasRecurringFieldsTarget) {
-      this.recurringFieldsTarget.classList.toggle("hidden", false)
+      this.recurringFieldsTarget.classList.remove("hidden")
     }
 
     if (this.hasRecurringOptionsTarget && checkbox) {

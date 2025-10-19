@@ -47,6 +47,13 @@ class TransactionsController < ApplicationController
 
     respond_to do |format|
       if @transaction.save
+        # Recalculate totals for current month
+        @month = params[:month] || Date.current.strftime("%Y-%m")
+        transactions_for_totals = current_user.family.transactions
+                                              .includes(:account, :category)
+                                              .by_month(@month)
+        @totals = calculate_totals(transactions_for_totals)
+
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.remove("transaction_modal"),
@@ -55,7 +62,10 @@ class TransactionsController < ApplicationController
                                  locals: { transaction: @transaction }),
             turbo_stream.update("account_#{@transaction.account_id}_balance",
                                partial: "accounts/balance_badge",
-                               locals: { account: @transaction.account })
+                               locals: { account: @transaction.account }),
+            turbo_stream.update("transactions_totals",
+                               partial: "transactions/totals",
+                               locals: { totals: @totals })
           ]
         end
         format.html { redirect_to transactions_path, notice: "Transação criada com sucesso." }
@@ -80,6 +90,13 @@ class TransactionsController < ApplicationController
   def update
     respond_to do |format|
       if @transaction.update(transaction_params)
+        # Recalculate totals for current month
+        @month = params[:month] || Date.current.strftime("%Y-%m")
+        transactions_for_totals = current_user.family.transactions
+                                              .includes(:account, :category)
+                                              .by_month(@month)
+        @totals = calculate_totals(transactions_for_totals)
+
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.remove("transaction_modal"),
@@ -88,7 +105,10 @@ class TransactionsController < ApplicationController
                                 locals: { transaction: @transaction }),
             turbo_stream.update("account_#{@transaction.account_id}_balance",
                                partial: "accounts/balance_badge",
-                               locals: { account: @transaction.account })
+                               locals: { account: @transaction.account }),
+            turbo_stream.update("transactions_totals",
+                               partial: "transactions/totals",
+                               locals: { totals: @totals })
           ]
         end
         format.html { redirect_to transactions_path, notice: "Transação atualizada com sucesso." }
@@ -107,13 +127,23 @@ class TransactionsController < ApplicationController
     account = @transaction.account
     @transaction.destroy
 
+    # Recalculate totals for current month
+    @month = params[:month] || Date.current.strftime("%Y-%m")
+    transactions_for_totals = current_user.family.transactions
+                                          .includes(:account, :category)
+                                          .by_month(@month)
+    @totals = calculate_totals(transactions_for_totals)
+
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.remove("transaction_#{@transaction.id}"),
           turbo_stream.update("account_#{account.id}_balance",
                              partial: "accounts/balance_badge",
-                             locals: { account: account })
+                             locals: { account: account }),
+          turbo_stream.update("transactions_totals",
+                             partial: "transactions/totals",
+                             locals: { totals: @totals })
         ]
       end
       format.html { redirect_to transactions_path, notice: "Transação excluída com sucesso." }

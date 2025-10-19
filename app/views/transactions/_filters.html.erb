@@ -1,5 +1,5 @@
 <%= form_with url: transactions_path, method: :get,
-    data: { turbo_frame: "transactions_list", controller: "filter", action: "input->filter#submit" } do |f| %>
+    data: { turbo_frame: "transactions_list", controller: "filter", filter_target: "form", action: "input->filter#submit" } do |f| %>
 
   <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
     <div>

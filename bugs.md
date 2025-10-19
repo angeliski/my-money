@@ -1,52 +1,44 @@
 # Bugs Encontrados - Transaction Management
 
-## 🔴 Crítico
+## ✅ Resolvido
 
-### 1. JavaScript Controllers Não Carregam
-**Arquivo:** Console do navegador
-**Erro:** `Failed to resolve module specifier "@hotwired/stimulus". Relative references must start with either "/", "./", or "../".`
+### 1. JavaScript Controllers Não Carregam ✅
+**Causa:** Controllers importavam `@hotwire/stimulus` (sem "d") ao invés de `@hotwired/stimulus`
+**Solução:** Corrigido imports em todos os controllers:
+- `modal_controller.js`: ✅
+- `transaction_form_controller.js`: ✅
+- `filter_controller.js`: ✅
 
-**Impacto:**
-- Filtros não funcionam (dependem do `filter_controller.js`)
-- Modais podem ter problemas (dependem do `modal_controller.js`)
-- Formulários de transação podem ter comportamento incorreto (`transaction_form_controller.js`)
+### 2. Filtros Não Funcionavam ✅
+**Causa 1:** Formulário não tinha `filter_target` para conectar com o Stimulus controller
+**Solução:** Adicionado `data: { filter_target: "form" }` em `_filters.html.erb`
 
-**Controladores Afetados:**
-- `controllers/modal_controller.js`
-- `controllers/transaction_form_controller.js`
-- `controllers/filter_controller.js`
+**Causa 2:** Query de busca usava `ILIKE` (PostgreSQL-only)
+**Solução:** Mudado para `LOWER(description) LIKE LOWER(?)` que funciona em SQLite e PostgreSQL (transaction.rb:70)
 
-**Causa Provável:**
-- Importmap não está resolvendo corretamente `@hotwired/stimulus`
-- Tentativa de correção com `bin/importmap pin @hotwired/stimulus` foi feita mas não resolveu
+### 3. Modal Navigation Issue ✅
+**Causa:** Botão "Cancelar" com `data: { turbo_frame: "_top" }` causava navegação completa
+**Solução:** Substituído por botão com `data-action="click->modal#close"` que apenas fecha o modal via JavaScript
+**Arquivos:** `_form.html.erb` (transactions e transfers)
 
-**User Stories Afetadas:**
-- User Story 2: Filtros não funcionam via interface
-- User Story 3: Opção de criar template/recorrente não aparece (campos hidden aguardam JavaScript)
+### 4. Totais Não Atualizavam em Tempo Real ✅
+**Causa:** Turbo Stream responses não incluíam atualização dos totais
+**Solução:**
+- Adicionado `id="transactions_totals"` no wrapper dos totais (_totals.html.erb:1)
+- Adicionado `turbo_stream.update("transactions_totals")` nas actions create, update e destroy
+- Totais agora são recalculados e atualizados automaticamente
 
 ---
 
 ## 🟡 Médio
 
-### 2. Totais Não Atualizam em Tempo Real Após Criar Transação
-**Arquivo:** `app/controllers/transactions_controller.rb` (create action)
-
-**Comportamento Atual:**
-- Após criar transação, a lista é atualizada mas os totais permanecem em 0
-- Apenas após recarregar a página (F5) os totais aparecem corretos
-
-**Comportamento Esperado:**
-- Totais deveriam atualizar automaticamente via Turbo Stream após criar transação
-
-**Impacto:**
-- UX confusa - usuário não vê reflexo imediato nos totais
-- Não impede funcionalidade, apenas requer refresh manual
+*(Nenhum bug médio pendente)*
 
 ---
 
 ## 🟢 Baixo
 
-*(Nenhum bug de baixa prioridade encontrado ainda)*
+*(Nenhum bug de baixa prioridade encontrado)*
 
 ---
 

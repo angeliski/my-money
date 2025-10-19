@@ -67,7 +67,7 @@ class Transaction < ApplicationRecord
     result = result.where(transaction_type: filters[:transaction_type_filter]) if filters[:transaction_type_filter].present?
     result = result.where(category_id: filters[:category_id]) if filters[:category_id].present?
     result = result.where(account_id: filters[:account_id]) if filters[:account_id].present?
-    result = result.where("description ILIKE ?", "%#{filters[:search]}%") if filters[:search].present?
+    result = result.where("LOWER(description) LIKE LOWER(?)", "%#{filters[:search]}%") if filters[:search].present?
 
     if filters[:status] == "effectuated"
       result = result.effectuated

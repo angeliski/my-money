@@ -36,8 +36,11 @@
   </div>
 
   <div class="flex gap-3 justify-end pt-4">
-    <%= link_to "Cancelar", transactions_path,
-        class: "px-4 py-2 text-slate-300 hover:text-slate-100" %>
+    <button type="button"
+        data-action="click->modal#close"
+        class="px-4 py-2 text-slate-300 hover:text-slate-100">
+      Cancelar
+    </button>
     <%= f.submit "Criar Transferência",
         class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg" %>
   </div>
