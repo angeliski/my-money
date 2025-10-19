@@ -25,6 +25,7 @@ class Account < ApplicationRecord
 
   # Callbacks
   before_validation :set_icon_and_color, on: :create
+  before_create :initialize_balance
 
   # Instance methods
   def current_balance
@@ -67,5 +68,9 @@ class Account < ApplicationRecord
       self.icon ||= "📈"
       self.color ||= "#10B981"
     end
+  end
+
+  def initialize_balance
+    self.balance_cents = initial_balance_cents
   end
 end
