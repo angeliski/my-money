@@ -191,7 +191,7 @@ class TransactionsController < ApplicationController
   end
 
   def filter_params
-    params.permit(:type, :category_id, :account_id, :status, :search, :period_start, :period_end)
+    params.permit(:transaction_type_filter, :category_id, :account_id, :status, :search, :period_start, :period_end)
   end
 
   def calculate_totals(transactions)

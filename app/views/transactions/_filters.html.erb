@@ -3,10 +3,10 @@
 
   <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
     <div>
-      <%= f.label :type, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
-      <%= f.select :type,
+      <%= f.label :transaction_type_filter, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.select :transaction_type_filter,
           [['Todas', ''], ['Receita', 'income'], ['Despesa', 'expense']],
-          { selected: params[:type] },
+          { selected: params[:transaction_type_filter] },
           class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
     </div>
 

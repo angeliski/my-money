@@ -58,7 +58,8 @@
       "Bash(bundle exec rails db:test:prepare)",
       "Bash(if [ -d \"/home/angeliski/workspace/my-money/specs/002-transaction-management/checklists\" ])",
       "Bash(then ls -1 \"/home/angeliski/workspace/my-money/specs/002-transaction-management/checklists/\"*.md)",
-      "Bash(cat db/seeds.rb)"
+      "Bash(cat db/seeds.rb)",
+      "Bash(git add -A)"
     ],
     "deny": [],
     "ask": []
