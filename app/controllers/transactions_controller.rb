@@ -1,6 +1,6 @@
 class TransactionsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_transaction, only: [ :show, :edit, :update, :destroy, :mark_as_paid, :unmark_as_paid ]
+  before_action :set_transaction, only: [ :edit, :update, :destroy, :mark_as_paid, :unmark_as_paid ]
   before_action :set_filter_data, only: [ :index, :new, :edit ]
 
   def index

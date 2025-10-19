@@ -45,8 +45,10 @@ class Transaction < ApplicationRecord
 
   # Scopes - Date scopes
   scope :by_month, lambda { |month_string|
-    date = Date.parse(month_string)
-    where(transaction_date: date.beginning_of_month..date.end_of_month)
+    year, month = month_string.split("-").map(&:to_i)
+    start_date = Date.new(year, month, 1)
+    end_date = start_date.end_of_month
+    where(transaction_date: start_date..end_date)
   }
   scope :in_period, ->(start_date, end_date) { where(transaction_date: start_date..end_date) }
 
