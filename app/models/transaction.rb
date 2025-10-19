@@ -12,6 +12,15 @@ class Transaction < ApplicationRecord
   # Money
   monetize :amount_cents
 
+  # Virtual attribute to accept amount in reais (BRL) and convert to cents
+  def amount=(value)
+    self.amount_cents = (value.to_f * 100).to_i if value.present?
+  end
+
+  def amount
+    amount_cents / 100.0 if amount_cents
+  end
+
   # Associations
   belongs_to :account
   belongs_to :category
