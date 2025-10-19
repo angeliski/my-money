@@ -45,6 +45,52 @@
         915
       ],
       "note": "This is a false positive because the :role attribute is only assignable by admin users."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "e1689f648c7d9dd7dfcc16ec08f81fc94715823753f1ca26f9ceee1231e8ff9b",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/transactions_controller.rb",
+      "line": 219,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:transaction).permit(:transaction_type, :amount, :transaction_date, :description, :category_id, :account_id, :is_template, :frequency, :start_date, :end_date)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "TransactionsController",
+        "method": "transaction_params"
+      },
+      "user_input": ":account_id",
+      "confidence": "High",
+      "cwe_id": [
+        915
+      ],
+      "note": "Protected by account_belongs_to_user_family validation in Transaction model (line 110) which ensures users can only create transactions in accounts belonging to their family."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "46d61d0df90f61cfdf613075a90102b1f83d15f653277b0b026996959705dd56",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/transactions_controller.rb",
+      "line": 228,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit(:transaction_type_filter, :category_id, :account_id, :status, :search, :period_start, :period_end)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "TransactionsController",
+        "method": "filter_params"
+      },
+      "user_input": ":account_id",
+      "confidence": "High",
+      "cwe_id": [
+        915
+      ],
+      "note": "This is used only for filtering/querying transactions, not for mass assignment. Query is scoped to current_user.family.transactions in the controller (line 9)."
     }
   ],
   "brakeman_version": "7.1.0"
