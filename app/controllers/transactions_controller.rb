@@ -46,6 +46,11 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.new(transaction_params)
     @transaction.user = current_user
 
+    # Handle manually_effectuated checkbox
+    if params[:transaction][:manually_effectuated] == "1"
+      @transaction.effectuated_at = Time.current
+    end
+
     respond_to do |format|
       if @transaction.save
         # Recalculate totals for current month
@@ -213,6 +218,7 @@ class TransactionsController < ApplicationController
     params.require(:transaction).permit(
       :transaction_type,
       :amount,
+      :amount_cents,
       :transaction_date,
       :description,
       :category_id,
@@ -220,7 +226,8 @@ class TransactionsController < ApplicationController
       :is_template,
       :frequency,
       :start_date,
-      :end_date
+      :end_date,
+      :destination_account_id
     )
   end
 

@@ -1,42 +1,113 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-slate-100">Transações</h1>
-    <%= link_to "Nova Transação", new_transaction_path,
-        class: "bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg",
-        data: { turbo_frame: "transaction_modal" } %>
-  </div>
-
-  <%= turbo_frame_tag "transaction_modal" %>
-
-  <!-- Toggle dos filtros -->
-  <div class="mb-4" data-controller="filters-toggle">
-    <button type="button"
-            data-action="click->filters-toggle#toggle"
-            class="text-slate-300 hover:text-slate-100 flex items-center gap-2 text-sm">
-      <span data-filters-toggle-target="icon">🔽</span>
-      <span data-filters-toggle-target="label">Mostrar filtros</span>
-    </button>
-
-    <!-- Filtros (hidden por padrão) -->
-    <div class="bg-slate-800 rounded-lg p-6 mt-4 hidden"
-         data-filters-toggle-target="content">
-      <%= render "filters" %>
+<!-- Header Roxo da Tela de Transações -->
+<div class="bg-[#7C3AED] -mx-4 -mt-4 px-4 pt-4 pb-6 lg:-mx-8 lg:-mt-8 lg:px-8 lg:pt-8">
+  <div class="container mx-auto">
+    <!-- Título e Ações -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+        Transações
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </h1>
+      <div class="flex items-center gap-2">
+        <%= link_to transactions_path, class: "text-white hover:text-white/90 p-2" do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        <% end %>
+        <button type="button" data-controller="filters-toggle" data-action="click->filters-toggle#toggle" class="text-white hover:text-white/90 p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
+        </button>
+        <button type="button" class="text-white hover:text-white/90 p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div class="bg-slate-800 rounded-lg p-6">
-    <div class="mb-4">
-      <%= render "month_selector", month: @month %>
-    </div>
-
-    <%= render "totals", totals: @totals %>
-
-    <%= turbo_frame_tag "transactions_list", class: "mt-6" do %>
-      <%= render "list", transactions: @transactions %>
-    <% end %>
-
-    <div class="mt-4">
-      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    <!-- Navegador de Mês -->
+    <%
+      year, month_num = @month.split("-").map(&:to_i)
+      current_date = Date.new(year, month_num, 1)
+      previous_month = (current_date - 1.month).strftime('%Y-%m')
+      next_month = (current_date + 1.month).strftime('%Y-%m')
+    %>
+    <div class="flex items-center justify-center gap-4">
+      <%= link_to transactions_path(month: previous_month), class: "text-white hover:text-white/90" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      <% end %>
+      <h2 class="text-xl font-semibold text-white">
+        <%= I18n.l(current_date, format: '%B').capitalize %>
+      </h2>
+      <%= link_to transactions_path(month: next_month), class: "text-white hover:text-white/90" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      <% end %>
     </div>
   </div>
 </div>
+
+<%= turbo_frame_tag "transaction_modal" %>
+
+<!-- Filtros (escondidos por padrão) -->
+<div class="hidden mt-4" data-controller="filters-toggle" data-filters-toggle-target="content">
+  <div class="bg-[#2D2D2D] rounded-lg p-6">
+    <%= render "filters" %>
+  </div>
+</div>
+
+<!-- Conteúdo Principal -->
+<div class="container mx-auto px-4 mt-6 lg:px-8">
+  <!-- Cards de Saldo -->
+  <div class="grid grid-cols-2 gap-4 mb-6 bg-[#2D2D2D] rounded-2xl p-4">
+    <div class="flex flex-col">
+      <div class="flex items-center gap-2 mb-1">
+        <svg class="w-4 h-4 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+        <span class="text-xs text-[#E5E5E5]">Saldo atual</span>
+      </div>
+      <div class="text-lg font-bold text-white">
+        <%= number_to_currency((@totals[:income] - @totals[:expense]) / 100.0, unit: 'R$ ', precision: 2) %>
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+      <div class="flex items-center gap-2 mb-1">
+        <svg class="w-4 h-4 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+        </svg>
+        <span class="text-xs text-[#E5E5E5]">Balanço mensal</span>
+      </div>
+      <div class="text-lg font-bold <%= (@totals[:income] - @totals[:expense]) >= 0 ? 'text-[#10B981]' : 'text-[#F87171]' %>">
+        <%= number_to_currency((@totals[:income] - @totals[:expense]) / 100.0, unit: 'R$ ', precision: 2) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Transações -->
+  <%= turbo_frame_tag "transactions_list" do %>
+    <%= render "list", transactions: @transactions %>
+  <% end %>
+
+  <!-- Paginação -->
+  <div class="mt-6">
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  </div>
+</div>
+
+<!-- FAB - Floating Action Button -->
+<button type="button"
+        class="fixed bottom-6 right-8 lg:bottom-8 lg:right-12 w-14 h-14 bg-[#7C3AED] hover:bg-[#6D28D9] rounded-full shadow-lg flex items-center justify-center text-white transition-all z-50"
+        data-controller="fab-menu"
+        data-action="click->fab-menu#toggle">
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+  </svg>
+</button>

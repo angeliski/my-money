@@ -84,7 +84,10 @@ RSpec.describe "Accounts", type: :request do
     it "renders new account form" do
       get new_account_path
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(I18n.t('accounts.new.title'))
+      expect(response.body).to include('turbo-frame')
+      expect(response.body).to include('name="account[name]"')
+      expect(response.body).to include('name="account[account_type]"')
+      expect(response.body).to include('Tipo de conta')
     end
   end
 

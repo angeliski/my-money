@@ -1,11 +1,53 @@
-<%= turbo_frame_tag "transaction_modal" do %>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 z-50" data-controller="modal">
-    <div class="bg-slate-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" data-modal-target="content">
-      <h2 class="text-2xl font-bold text-slate-100 mb-4">
-        <%= transaction.new_record? ? "Nova Transação" : "Editar Transação" %>
-      </h2>
+<%
+  # Determinar o tipo de transação pelo parâmetro ou pelo objeto
+  transaction_type = params[:type] || (transaction.income? ? 'income' : (transaction.expense? ? 'expense' : 'transfer'))
 
-      <%= render "form", transaction: transaction %>
+  # Definir cores e títulos baseados no tipo
+  case transaction_type
+  when 'income'
+    header_color = 'bg-gradient-to-b from-[#10B981] to-[#059669]'
+    title = transaction.new_record? ? 'Nova receita' : 'Editar receita'
+    toggle_label = 'Recebido'
+  when 'expense'
+    header_color = 'bg-gradient-to-b from-[#EF4444] to-[#DC2626]'
+    title = transaction.new_record? ? 'Nova despesa' : 'Editar despesa'
+    toggle_label = 'Pago'
+  else
+    header_color = 'bg-gradient-to-b from-[#8B5CF6] to-[#7C3AED]'
+    title = transaction.new_record? ? 'Nova transferência' : 'Editar transferência'
+    toggle_label = nil
+  end
+%>
+
+<%= turbo_frame_tag "transaction_modal" do %>
+  <div class="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
+       data-controller="modal"
+       data-action="click->modal#closeBackground">
+    <!-- Formulário fullscreen mobile, modal desktop -->
+    <div class="bg-[#1E1E1E] w-full h-full sm:h-auto sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] flex flex-col overflow-hidden"
+         data-modal-target="content"
+         data-action="click->modal#stopPropagation">
+
+      <!-- Header Colorido -->
+      <div class="<%= header_color %> px-6 pt-6 pb-20">
+        <!-- Botão Voltar -->
+        <button type="button"
+                data-action="click->modal#close"
+                class="text-white/90 hover:text-white mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+
+        <h2 class="text-xl font-semibold text-white mb-1">
+          <%= title %>
+        </h2>
+      </div>
+
+      <!-- Corpo do Formulário (Área Branca/Cinza) -->
+      <div class="flex-1 bg-[#2D2D2D] -mt-16 rounded-t-3xl px-6 py-6 overflow-y-auto">
+        <%= render "form_fields", transaction: transaction, transaction_type: transaction_type, toggle_label: toggle_label, header_color: header_color %>
+      </div>
     </div>
   </div>
 <% end %>

@@ -4,20 +4,35 @@ export default class extends Controller {
   static targets = ["content"]
 
   connect() {
-    this.element.addEventListener("click", this.handleBackdropClick.bind(this))
+    // Adicionar listener para ESC key
+    this.escapeHandler = this.handleEscape.bind(this)
+    document.addEventListener("keydown", this.escapeHandler)
   }
 
   disconnect() {
-    this.element.removeEventListener("click", this.handleBackdropClick.bind(this))
+    document.removeEventListener("keydown", this.escapeHandler)
   }
 
-  handleBackdropClick(event) {
+  handleEscape(event) {
+    if (event.key === "Escape") {
+      this.close()
+    }
+  }
+
+  closeBackground(event) {
     if (event.target === this.element) {
       this.close()
     }
   }
 
-  close() {
+  stopPropagation(event) {
+    event.stopPropagation()
+  }
+
+  close(event) {
+    if (event) {
+      event.preventDefault()
+    }
     this.element.remove()
   }
 }

@@ -1,0 +1,150 @@
+<%= turbo_frame_tag "account_modal" do %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+       data-controller="modal"
+       data-action="click->modal#closeBackground">
+    <!-- Modal Content: Fullscreen em mobile, modal em desktop -->
+    <div class="bg-[#1E1E1E] w-full h-full sm:h-auto sm:max-w-lg sm:rounded-2xl sm:max-h-[90vh] flex flex-col overflow-hidden"
+         data-modal-target="content"
+         data-action="click->modal#stopPropagation">
+
+      <%= form_with model: @account, data: { controller: "money-input account-form" }, class: "flex flex-col h-full" do |f| %>
+        <!-- Header Azul com Valor -->
+        <div class="bg-gradient-to-b from-[#3B82F6] to-[#2563EB] px-6 pt-6 pb-20 flex-shrink-0">
+          <button type="button"
+                  data-action="click->modal#close"
+                  class="text-white hover:text-white/90 mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+
+          <h2 class="text-2xl font-bold text-white mb-4"><%= @account.persisted? ? "Editar conta" : "Nova conta" %></h2>
+
+          <div class="text-white/80 text-sm mb-2">Saldo atual da conta</div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-4xl font-bold text-white">R$</span>
+            <input type="text"
+                   data-money-input-target="input"
+                   data-action="input->money-input#format"
+                   placeholder="0,00"
+                   value="<%= @account.persisted? ? number_to_currency(@account.initial_balance, unit: '', delimiter: '.', separator: ',') : '' %>"
+                   class="bg-transparent text-4xl font-bold text-white outline-none w-full placeholder-white/50">
+          </div>
+
+          <!-- Campo hidden para o saldo (será populado pelo money-input controller) -->
+          <%= f.hidden_field :initial_balance,
+              data: { money_input_target: "hiddenInput" },
+              value: @account.persisted? ? number_to_currency(@account.initial_balance, unit: '', delimiter: '.', separator: ',') : '' %>
+        </div>
+
+        <!-- Form Body com fundo cinza e cantos arredondados -->
+        <div class="bg-[#2D2D2D] -mt-16 rounded-t-3xl flex-1 overflow-y-auto pt-6 px-6 pb-24">
+          <% if @account.errors.any? %>
+            <div class="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-4">
+              <p class="font-semibold mb-2">Erro ao salvar a conta:</p>
+              <ul class="list-disc list-inside text-sm">
+                <% @account.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="space-y-4">
+            <!-- Nome da Conta -->
+            <div>
+              <div class="flex items-center gap-3 bg-[#1E1E1E] px-4 py-3 rounded-xl">
+                <!-- Ícone -->
+                <svg class="w-5 h-5 text-[#A3A3A3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                </svg>
+
+                <div class="flex-1">
+                  <div class="text-xs text-[#A3A3A3] mb-1">Nome</div>
+                  <%= f.text_field :name,
+                      maxlength: 50,
+                      required: true,
+                      placeholder: "Ex: Nubank, Bradesco...",
+                      class: "w-full bg-transparent text-white outline-none placeholder-[#6B7280]",
+                      data: {
+                        account_form_target: "name",
+                        action: "blur->account-form#validateName"
+                      } %>
+                </div>
+              </div>
+              <span class="hidden text-red-400 text-sm mt-1 px-4" data-account-form-target="nameError"></span>
+            </div>
+
+            <!-- Tipo de Conta -->
+            <div>
+              <div class="flex items-center gap-3 bg-[#1E1E1E] px-4 py-3 rounded-xl">
+                <!-- Ícone -->
+                <svg class="w-5 h-5 text-[#A3A3A3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+
+                <div class="flex-1">
+                  <div class="text-xs text-[#A3A3A3] mb-1">Tipo de conta</div>
+                  <%= f.select :account_type,
+                      account_type_options,
+                      { prompt: "Selecione o tipo" },
+                      {
+                        required: true,
+                        disabled: @account.persisted?,
+                        class: "w-full bg-transparent text-white outline-none #{'opacity-50 cursor-not-allowed' if @account.persisted?}"
+                      } %>
+                </div>
+              </div>
+              <% if @account.persisted? %>
+                <small class="text-[#A3A3A3] text-xs mt-1 block px-4">O tipo de conta não pode ser alterado após a criação</small>
+              <% end %>
+            </div>
+
+            <!-- Cor da Conta -->
+            <div>
+              <div class="flex items-center gap-3 bg-[#1E1E1E] px-4 py-3 rounded-xl">
+                <!-- Ícone -->
+                <svg class="w-5 h-5 text-[#A3A3A3] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+
+                <div class="flex-1">
+                  <div class="text-xs text-[#A3A3A3] mb-2">Cor da conta</div>
+                  <div class="flex gap-2 flex-wrap">
+                    <% colors = [
+                      { name: 'Roxo', value: '#7C3AED' },
+                      { name: 'Azul', value: '#3B82F6' },
+                      { name: 'Verde', value: '#10B981' },
+                      { name: 'Vermelho', value: '#EF4444' },
+                      { name: 'Ciano', value: '#06B6D4' },
+                      { name: 'Amarelo', value: '#F59E0B' }
+                    ] %>
+                    <% colors.each do |color| %>
+                      <label class="cursor-pointer">
+                        <%= f.radio_button :color, color[:value],
+                            class: "hidden peer",
+                            data: { account_form_target: "colorOption" } %>
+                        <div class="w-10 h-10 rounded-full border-2 border-transparent peer-checked:border-white peer-checked:ring-2 peer-checked:ring-white/50"
+                             style="background-color: <%= color[:value] %>;"
+                             title="<%= color[:name] %>">
+                        </div>
+                      </label>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão de Confirmação Flutuante -->
+        <button type="submit"
+                class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 w-14 h-14 bg-[#3B82F6] hover:bg-[#2563EB] rounded-full shadow-lg flex items-center justify-center text-white z-10 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,18 +1,31 @@
-<div id="transactions_list" class="space-y-4">
+<div id="transactions_list" class="space-y-6">
   <% if transactions.any? %>
-    <% transactions.group_by(&:transaction_date).each do |date, day_transactions| %>
-      <% day_total = day_transactions.sum { |t| t.income? ? t.amount_cents : -t.amount_cents } %>
-      <div class="mb-4">
-        <div class="flex items-center justify-between mb-2 px-1">
-          <div class="text-sm font-medium text-slate-300">
-            <%= format_day_header(date) %>
-          </div>
-          <div class="text-sm font-semibold <%= day_total >= 0 ? 'text-green-400' : 'text-red-400' %>">
-            <%= number_to_currency(day_total / 100.0, unit: 'R$ ', precision: 0) %>
-          </div>
+    <%
+      # Agrupar por status: Efetivadas vs Pendentes
+      effectuated = transactions.select { |t| !t.pending_by_date? || t.manually_effectuated? }
+      pending = transactions.select { |t| t.pending_by_date? && !t.manually_effectuated? }
+    %>
+
+    <% if effectuated.any? %>
+      <div class="mb-6">
+        <div class="flex items-center mb-3 px-1">
+          <div class="text-base font-semibold text-slate-200">Efetivadas</div>
         </div>
         <div class="space-y-2">
-          <% day_transactions.each do |transaction| %>
+          <% effectuated.sort_by(&:transaction_date).reverse.each do |transaction| %>
+            <%= render "transaction", transaction: transaction %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if pending.any? %>
+      <div class="mb-6">
+        <div class="flex items-center mb-3 px-1">
+          <div class="text-base font-semibold text-slate-200">Pendentes</div>
+        </div>
+        <div class="space-y-2">
+          <% pending.sort_by(&:transaction_date).reverse.each do |transaction| %>
             <%= render "transaction", transaction: transaction %>
           <% end %>
         </div>

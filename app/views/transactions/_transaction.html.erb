@@ -1,54 +1,73 @@
-<div id="<%= dom_id(transaction) %>" class="bg-slate-700 rounded-lg p-3 flex items-center justify-between hover:bg-slate-600 transition group">
+<div id="<%= dom_id(transaction) %>" class="bg-[#2D2D2D] rounded-lg p-4 flex items-center justify-between hover:bg-[#3D3D3D] transition group">
   <div class="flex items-center gap-3 flex-1">
-    <div class="text-2xl">
-      <%= transaction.category.icon rescue '💰' %>
+    <!-- Ícone circular da categoria -->
+    <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl <%= transaction.income? ? 'bg-green-500/20' : 'bg-red-500/20' %>">
+      <%= transaction.category.icon rescue (transaction.income? ? '💵' : '💸') %>
     </div>
+
     <div class="flex-1">
-      <div class="text-sm font-medium text-slate-100"><%= transaction.category.name %></div>
-      <div class="text-xs text-slate-400">
-        <%= l(transaction.transaction_date, format: '%d-%m-%Y %H:%M') %>
-        <% if transaction.template? %>
-          <span class="ml-2 text-cyan-400">🔄 Recorrente</span>
-        <% elsif transaction.generated? && transaction.pending_by_date? %>
-          <span class="ml-2 text-yellow-400">⏳ Pendente</span>
-        <% end %>
+      <!-- Nome da transação -->
+      <div class="text-sm font-medium text-white"><%= transaction.description.presence || transaction.category.name %></div>
+
+      <!-- Detalhes: Categoria | Conta | Data -->
+      <div class="text-xs text-[#E5E5E5] flex items-center gap-1">
+        <span><%= transaction.category.name %></span>
+        <span>|</span>
+        <span><%= transaction.account.name %></span>
+        <span>|</span>
+        <span><%= l(transaction.transaction_date, format: :short) %></span>
       </div>
     </div>
   </div>
 
   <div class="flex items-center gap-3">
-    <div class="text-right">
-      <div class="font-semibold <%= transaction.income? ? 'text-green-400' : 'text-red-400' %>">
-        <%= number_to_currency(transaction.amount_cents / 100.0, unit: 'R$ ', precision: 0) %>
+    <!-- Valor -->
+    <div class="text-right flex items-center gap-2">
+      <div class="font-semibold <%= transaction.income? ? 'text-[#10B981]' : 'text-[#F87171]' %>">
+        <%= number_to_currency(transaction.amount_cents / 100.0, unit: 'R$ ', precision: 2) %>
       </div>
+
+      <!-- Ícone de status -->
+      <% if transaction.template? %>
+        <span class="text-[#8B5CF6]" title="Recorrente">🔄</span>
+      <% elsif transaction.generated? && transaction.pending_by_date? && !transaction.manually_effectuated? %>
+        <span class="text-yellow-400" title="Pendente">⏰</span>
+      <% elsif !transaction.pending_by_date? || transaction.manually_effectuated? %>
+        <span class="text-green-400" title="Efetivada">✓</span>
+      <% end %>
     </div>
 
+    <!-- Ações (aparecem no hover) -->
     <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
       <% if transaction.generated? && transaction.pending_by_date? && !transaction.manually_effectuated? %>
         <%= button_to mark_as_paid_transaction_path(transaction),
             method: :post,
-            class: "text-green-400 hover:text-green-300 text-xs px-2 py-1",
+            class: "text-green-400 hover:text-green-300 text-xs px-2 py-1 rounded",
+            title: "Marcar como pago",
             data: { turbo: true } do %>
           ✓
         <% end %>
       <% elsif transaction.manually_effectuated? && transaction.pending_by_date? %>
         <%= button_to mark_as_paid_transaction_path(transaction),
             method: :delete,
-            class: "text-yellow-400 hover:text-yellow-300 text-xs px-2 py-1",
+            class: "text-yellow-400 hover:text-yellow-300 text-xs px-2 py-1 rounded",
+            title: "Desmarcar como pago",
             data: { turbo: true } do %>
           ✗
         <% end %>
       <% end %>
 
       <%= link_to edit_transaction_path(transaction),
-          class: "text-cyan-400 hover:text-cyan-300 px-2 py-1",
+          class: "text-[#7C3AED] hover:text-[#6D28D9] px-2 py-1 rounded",
+          title: "Editar",
           data: { turbo_frame: "transaction_modal" } do %>
         ✏️
       <% end %>
 
       <%= button_to transaction_path(transaction),
           method: :delete,
-          class: "text-red-400 hover:text-red-300 px-2 py-1",
+          class: "text-red-400 hover:text-red-300 px-2 py-1 rounded",
+          title: "Excluir",
           data: { turbo: true, turbo_confirm: "Tem certeza que deseja excluir esta transação?" } do %>
         🗑️
       <% end %>

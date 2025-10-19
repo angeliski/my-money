@@ -17,10 +17,21 @@ class AccountsController < ApplicationController
   def create
     @account = current_user.family.accounts.build(account_params)
 
-    if @account.save
-      redirect_to accounts_path, notice: t(".success")
-    else
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if @account.save
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.remove("account_modal"),
+            turbo_stream.prepend("accounts-list",
+                                partial: "accounts/account",
+                                locals: { account: @account })
+          ]
+        end
+        format.html { redirect_to accounts_path, notice: t(".success") }
+      else
+        format.turbo_stream { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
   end
 

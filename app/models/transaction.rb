@@ -12,6 +12,9 @@ class Transaction < ApplicationRecord
   # Money
   monetize :amount_cents
 
+  # Virtual attribute for transfers (used in forms, not persisted)
+  attr_accessor :destination_account_id
+
   # Virtual attribute to accept amount in reais (BRL) and convert to cents
   def amount=(value)
     self.amount_cents = (value.to_f * 100).to_i if value.present?

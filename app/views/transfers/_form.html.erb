@@ -1,47 +1,95 @@
-<%= form_with(scope: :transfer, url: transfers_path, class: "space-y-4") do |f| %>
-  <div>
-    <%= f.label :from_account_id, "Conta Origem", class: "block text-sm font-medium text-slate-300 mb-1" %>
-    <%= f.select :from_account_id,
-        options_from_collection_for_select(@accounts, :id, :name),
-        { prompt: "Selecione a conta de origem" },
-        required: true,
-        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+<%= form_with(scope: :transfer, url: transfers_path, data: { controller: "transaction-form" }, class: "space-y-4") do |f| %>
+  <!-- Campo hidden para amount (valor convertido) -->
+  <%= f.hidden_field :amount, data: { 'money-input-target': 'hiddenInput' } %>
+
+  <!-- Data -->
+  <div class="flex items-center gap-3 py-3 border-b border-[#3D3D3D]">
+    <svg class="w-5 h-5 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+    </svg>
+    <%= f.date_field :transaction_date,
+        value: Date.today,
+        class: "flex-1 bg-transparent text-[#E5E5E5] outline-none" %>
   </div>
 
-  <div>
-    <%= f.label :to_account_id, "Conta Destino", class: "block text-sm font-medium text-slate-300 mb-1" %>
-    <%= f.select :to_account_id,
-        options_from_collection_for_select(@accounts, :id, :name),
-        { prompt: "Selecione a conta de destino" },
-        required: true,
-        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  <!-- De conta -->
+  <div class="flex items-center gap-3 py-3 border-b border-[#3D3D3D]">
+    <svg class="w-5 h-5 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+    </svg>
+    <div class="flex-1">
+      <label class="text-xs text-[#E5E5E5] block mb-1">De conta</label>
+      <%= f.select :from_account_id,
+          options_from_collection_for_select(@accounts, :id, :name),
+          { prompt: 'Selecionar conta origem' },
+          { class: "w-full bg-[#4D4D4D] text-[#E5E5E5] rounded-lg px-3 py-2 outline-none", required: true } %>
+    </div>
   </div>
 
-  <div>
-    <%= f.label :amount, "Valor", class: "block text-sm font-medium text-slate-300 mb-1" %>
-    <%= f.number_field :amount, step: 0.01, min: 0.01, required: true,
-        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  <!-- Separador -->
+  <div class="flex items-center justify-center py-2">
+    <div class="text-center">
+      <svg class="w-6 h-6 text-[#E5E5E5] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+      <span class="text-xs text-[#E5E5E5]">Transferir para</span>
+    </div>
   </div>
 
-  <div>
-    <%= f.label :transaction_date, "Data", class: "block text-sm font-medium text-slate-300 mb-1" %>
-    <%= f.date_field :transaction_date, value: Date.current, required: true,
-        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  <!-- Para conta -->
+  <div class="flex items-center gap-3 py-3 border-b border-[#3D3D3D]">
+    <svg class="w-5 h-5 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+    </svg>
+    <div class="flex-1">
+      <label class="text-xs text-[#E5E5E5] block mb-1">Para conta</label>
+      <%= f.select :to_account_id,
+          options_from_collection_for_select(@accounts, :id, :name),
+          { prompt: 'Selecionar conta destino' },
+          { class: "w-full bg-[#4D4D4D] text-[#E5E5E5] rounded-lg px-3 py-2 outline-none", required: true } %>
+    </div>
   </div>
 
-  <div>
-    <%= f.label :description, "Descrição", class: "block text-sm font-medium text-slate-300 mb-1" %>
-    <%= f.text_field :description, required: true,
-        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  <!-- Descrição -->
+  <div class="flex items-center gap-3 py-3 border-b border-[#3D3D3D]">
+    <svg class="w-5 h-5 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+    </svg>
+    <%= f.text_field :description,
+        placeholder: "Descrição",
+        class: "flex-1 bg-transparent text-[#E5E5E5] placeholder-[#A3A3A3] outline-none" %>
   </div>
 
-  <div class="flex gap-3 justify-end pt-4">
-    <button type="button"
-        data-action="click->modal#close"
-        class="px-4 py-2 text-slate-300 hover:text-slate-100">
-      Cancelar
-    </button>
-    <%= f.submit "Criar Transferência",
-        class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg" %>
+  <!-- Observação (opcional, comentado por enquanto) -->
+  <!-- <div class="flex items-start gap-3 py-3 border-b border-[#3D3D3D]">
+    <svg class="w-5 h-5 text-[#E5E5E5] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+    </svg>
+    <%= f.text_area :notes,
+        placeholder: "Observação (opcional)",
+        rows: 2,
+        class: "flex-1 bg-transparent text-[#E5E5E5] placeholder-[#A3A3A3] outline-none resize-none" %>
+  </div> -->
+
+  <!-- Toggle Transferência Recorrente (comentado por enquanto) -->
+  <!-- <div class="flex items-center justify-between py-3 border-b border-[#3D3D3D]">
+    <div class="flex items-center gap-3">
+      <svg class="w-5 h-5 text-[#E5E5E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      <span class="text-[#E5E5E5] font-medium">Transferência recorrente</span>
+    </div>
+    <label class="relative inline-flex items-center cursor-pointer">
+      <%= f.check_box :is_template,
+          class: "sr-only peer",
+          data: { action: "change->transaction-form#toggleRecurring" } %>
+      <div class="w-11 h-6 bg-[#4D4D4D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7C3AED]"></div>
+    </label>
+  </div> -->
+
+  <!-- Botão de Confirmação (Fixo no bottom) -->
+  <div class="fixed bottom-0 left-0 right-0 sm:relative p-6 bg-[#2D2D2D] sm:bg-transparent sm:p-0 sm:mt-6">
+    <%= f.submit 'CRIAR TRANSFERÊNCIA',
+        class: "w-full sm:w-auto sm:min-w-[200px] bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-semibold py-4 rounded-full transition-colors shadow-lg" %>
   </div>
 <% end %>
