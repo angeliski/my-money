@@ -1,9 +1,14 @@
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-slate-100">Transações</h1>
-    <%= link_to "Nova Transação", new_transaction_path,
-        class: "bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg",
-        data: { turbo_frame: "transaction_modal" } %>
+    <div class="flex gap-3">
+      <%= link_to "Nova Transferência", new_transfer_path,
+          class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg",
+          data: { turbo_frame: "transaction_modal" } %>
+      <%= link_to "Nova Transação", new_transaction_path,
+          class: "bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg",
+          data: { turbo_frame: "transaction_modal" } %>
+    </div>
   </div>
 
   <%= turbo_frame_tag "transaction_modal" %>
