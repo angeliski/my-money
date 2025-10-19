@@ -1,0 +1,52 @@
+pt-BR:
+  accounts:
+    index:
+      title: "Minhas Contas"
+      new_account: "Nova Conta"
+      net_worth: "Patrimônio Total"
+      empty_state: "Você ainda não possui contas cadastradas"
+      empty_state_subtitle: "Crie sua primeira conta para começar a organizar suas finanças"
+      show_archived: "Mostrar arquivadas"
+      hide_archived: "Ocultar arquivadas"
+      archived_title: "Contas Arquivadas"
+    new:
+      title: "Nova Conta"
+    edit:
+      title: "Editar Conta"
+    show:
+      title: "Detalhes da Conta"
+      back: "Voltar"
+      edit: "Editar"
+      archive: "Arquivar"
+    form:
+      name: "Nome da Conta"
+      name_placeholder: "Ex: Nubank, Bradesco, Tesouro Direto"
+      account_type: "Tipo de Conta"
+      account_type_prompt: "Selecione o tipo..."
+      initial_balance: "Saldo Inicial"
+      initial_balance_placeholder: "0,00"
+      initial_balance_help: "Valor em reais. Ex: 18.456,77 ou -1.250,50"
+      type_immutable_notice: "O tipo da conta não pode ser alterado após a criação"
+      submit_create: "Criar Conta"
+      submit_update: "Salvar Alterações"
+      cancel: "Cancelar"
+      account_types:
+        checking: "🏦 Conta Corrente"
+        investment: "📈 Investimentos"
+    create:
+      success: "Conta criada com sucesso!"
+    update:
+      success: "Conta atualizada com sucesso!"
+    archive:
+      success: "Conta arquivada com sucesso!"
+      confirm: "Tem certeza que deseja arquivar esta conta? O histórico de transações será preservado e a conta poderá ser reativada a qualquer momento."
+    unarchive:
+      success: "Conta reativada com sucesso!"
+    not_found: "Conta não encontrada ou você não tem permissão para acessá-la"
+    actions:
+      view: "Ver detalhes"
+      edit: "Editar"
+      archive: "Arquivar"
+      unarchive: "Reativar"
+      back_to_list: "← Voltar para lista de contas"
+      back_to_account: "← Voltar para conta"

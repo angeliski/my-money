@@ -1,0 +1,255 @@
+require 'rails_helper'
+
+RSpec.describe "Accounts Management", type: :system do
+  let(:user) { create(:user, email: "test@example.com", password: "password123", status: :active) }
+  let(:family) { user.family }
+
+  before do
+    driven_by(:rack_test)
+    sign_in user
+  end
+
+  describe "User Story 1: Creating first account" do
+    scenario "User sees empty state and creates first checking account" do
+      visit accounts_path
+
+      # Verify empty state
+      expect(page).to have_content(I18n.t('accounts.index.empty_state'))
+      expect(page).to have_link(I18n.t('accounts.index.new_account'))
+
+      # Click to create account
+      click_link I18n.t('accounts.index.new_account'), match: :first
+
+      # Fill in the form
+      fill_in I18n.t('accounts.form.name'), with: "Nubank"
+      select I18n.t('accounts.form.account_types.checking'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "150000"
+
+      # Submit the form
+      click_button I18n.t('accounts.form.submit_create')
+
+      # Verify success
+      expect(page).to have_content(I18n.t('accounts.create.success'))
+      expect(page).to have_content("Nubank")
+      expect(page).to have_content("🏦")
+
+      # Verify account was created
+      account = Account.last
+      expect(account.name).to eq("Nubank")
+      expect(account.account_type).to eq("checking")
+      expect(account.initial_balance_cents).to eq(150000)
+      expect(account.family).to eq(family)
+    end
+
+    scenario "User creates investment account" do
+      visit accounts_path
+      click_link I18n.t('accounts.index.new_account'), match: :first
+
+      fill_in I18n.t('accounts.form.name'), with: "Tesouro Direto"
+      select I18n.t('accounts.form.account_types.investment'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "1000000"
+
+      click_button I18n.t('accounts.form.submit_create')
+
+      expect(page).to have_content("Tesouro Direto")
+      expect(page).to have_content("📈")
+
+      account = Account.last
+      expect(account.account_type).to eq("investment")
+      expect(account.icon).to eq("📈")
+      expect(account.color).to eq("#10B981")
+    end
+
+    scenario "User tries to create account with empty name" do
+      visit accounts_path
+      click_link I18n.t('accounts.index.new_account'), match: :first
+
+      fill_in I18n.t('accounts.form.name'), with: ""
+      select I18n.t('accounts.form.account_types.checking'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "150000"
+
+      click_button I18n.t('accounts.form.submit_create')
+
+      expect(page).to have_content("não pode ficar em branco")
+      expect(Account.count).to eq(0)
+    end
+  end
+
+  describe "User Story 2: Viewing account list" do
+    let!(:checking_account) { create(:account, :checking, family: family, name: "Nubank", initial_balance_cents: 150000) }
+    let!(:investment_account) { create(:account, :investment, family: family, name: "Tesouro", initial_balance_cents: 1000000) }
+
+    scenario "User sees list of accounts with balances" do
+      visit accounts_path
+
+      expect(page).to have_content("Nubank")
+      expect(page).to have_content("Tesouro")
+      expect(page).to have_content("🏦")
+      expect(page).to have_content("📈")
+
+      # Check that net worth is displayed
+      expect(page).to have_content(I18n.t('accounts.index.net_worth'))
+    end
+
+    scenario "Accounts are ordered by creation date (most recent first)" do
+      older_account = create(:account, family: family, name: "Old Account", created_at: 2.days.ago)
+      newer_account = create(:account, family: family, name: "New Account", created_at: 1.day.ago)
+
+      visit accounts_path
+
+      # The newer account should appear before the older one
+      account_names = page.all('.text-white.text-lg.font-semibold').map(&:text)
+      newer_index = account_names.index("New Account")
+      older_index = account_names.index("Old Account")
+
+      expect(newer_index).to be < older_index if newer_index && older_index
+    end
+  end
+
+  describe "User Story 3: Editing account" do
+    let!(:account) { create(:account, family: family, name: "Nubank", initial_balance_cents: 150000, account_type: :checking) }
+
+    scenario "User edits account name and balance" do
+      visit accounts_path
+
+      click_link I18n.t('accounts.actions.edit'), match: :first
+
+      fill_in I18n.t('accounts.form.name'), with: "Nubank PJ"
+      fill_in I18n.t('accounts.form.initial_balance'), with: "200000"
+
+      click_button I18n.t('accounts.form.submit_update')
+
+      expect(page).to have_content(I18n.t('accounts.update.success'))
+      expect(page).to have_content("Nubank PJ")
+
+      account.reload
+      expect(account.name).to eq("Nubank PJ")
+      expect(account.initial_balance_cents).to eq(200000)
+    end
+
+    scenario "Account type field is disabled when editing" do
+      visit edit_account_path(account)
+
+      account_type_field = find_field(I18n.t('accounts.form.account_type'))
+      expect(account_type_field).to be_disabled
+
+      expect(page).to have_content(I18n.t('accounts.form.type_immutable_notice'))
+    end
+  end
+
+  describe "User Story 4: Archiving account" do
+    let!(:account) { create(:account, family: family, name: "Old Account") }
+
+    scenario "User archives an account" do
+      visit accounts_path
+
+      expect(page).to have_content("Old Account")
+
+      # Archive the account
+      accept_confirm do
+        click_link I18n.t('accounts.actions.archive'), match: :first
+      end
+
+      expect(page).to have_content(I18n.t('accounts.archive.success'))
+      expect(page).not_to have_content("Old Account")
+
+      account.reload
+      expect(account.archived?).to be true
+    end
+
+    scenario "User views archived accounts" do
+      archived_account = create(:account, :archived, family: family, name: "Archived Account")
+
+      visit accounts_path
+
+      expect(page).not_to have_content("Archived Account")
+
+      click_link I18n.t('accounts.index.show_archived')
+
+      expect(page).to have_content("Archived Account")
+      expect(page).to have_content(I18n.t('accounts.index.archived_title'))
+    end
+
+    scenario "User unarchives an account" do
+      account.archive!
+
+      visit accounts_path(show_archived: true)
+
+      click_link I18n.t('accounts.actions.unarchive'), match: :first
+
+      expect(page).to have_content(I18n.t('accounts.unarchive.success'))
+
+      account.reload
+      expect(account.archived?).to be false
+    end
+  end
+
+  describe "User Story 5: Creating multiple accounts of different types" do
+    scenario "User creates multiple checking accounts" do
+      visit accounts_path
+
+      # Create first checking account
+      click_link I18n.t('accounts.index.new_account'), match: :first
+      fill_in I18n.t('accounts.form.name'), with: "Nubank"
+      select I18n.t('accounts.form.account_types.checking'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "150000"
+      click_button I18n.t('accounts.form.submit_create')
+
+      # Create second checking account
+      click_link I18n.t('accounts.index.new_account'), match: :first
+      fill_in I18n.t('accounts.form.name'), with: "Bradesco"
+      select I18n.t('accounts.form.account_types.checking'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "500000"
+      click_button I18n.t('accounts.form.submit_create')
+
+      expect(page).to have_content("Nubank")
+      expect(page).to have_content("Bradesco")
+
+      # Both should have checking icon
+      expect(Account.where(family: family).count).to eq(2)
+      expect(Account.where(family: family, account_type: :checking).count).to eq(2)
+    end
+
+    scenario "User creates both checking and investment accounts" do
+      visit accounts_path
+
+      # Create checking account
+      click_link I18n.t('accounts.index.new_account'), match: :first
+      fill_in I18n.t('accounts.form.name'), with: "Nubank"
+      select I18n.t('accounts.form.account_types.checking'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "150000"
+      click_button I18n.t('accounts.form.submit_create')
+
+      # Create investment account
+      click_link I18n.t('accounts.index.new_account'), match: :first
+      fill_in I18n.t('accounts.form.name'), with: "Tesouro Direto"
+      select I18n.t('accounts.form.account_types.investment'), from: I18n.t('accounts.form.account_type')
+      fill_in I18n.t('accounts.form.initial_balance'), with: "1000000"
+      click_button I18n.t('accounts.form.submit_create')
+
+      expect(page).to have_content("Nubank")
+      expect(page).to have_content("Tesouro Direto")
+      expect(page).to have_content("🏦")
+      expect(page).to have_content("📈")
+
+      expect(Account.where(family: family, account_type: :checking).count).to eq(1)
+      expect(Account.where(family: family, account_type: :investment).count).to eq(1)
+    end
+  end
+
+  describe "Account details page" do
+    let!(:account) { create(:account, family: family, name: "Nubank", initial_balance_cents: 150000) }
+
+    scenario "User views account details" do
+      visit accounts_path
+
+      click_link I18n.t('accounts.actions.view'), match: :first
+
+      expect(page).to have_content("Nubank")
+      expect(page).to have_content("Saldo Atual")
+      expect(page).to have_content("Saldo Inicial")
+      expect(page).to have_content("Tipo")
+      expect(page).to have_content("Criada em")
+    end
+  end
+end

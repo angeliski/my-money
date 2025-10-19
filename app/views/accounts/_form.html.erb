@@ -1,0 +1,63 @@
+<%= form_with model: account, data: { controller: "account-form" } do |f| %>
+  <% if account.errors.any? %>
+    <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-4">
+      <p class="font-semibold mb-2">Erro ao salvar a conta:</p>
+      <ul class="list-disc list-inside text-sm">
+        <% account.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-4">
+    <%= f.label :name, t('accounts.form.name'), class: "block text-sm font-semibold text-gray-300 mb-2" %>
+    <%= f.text_field :name,
+        maxlength: 50,
+        required: true,
+        placeholder: t('accounts.form.name_placeholder'),
+        class: "w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600",
+        data: {
+          account_form_target: "name",
+          action: "blur->account-form#validateName"
+        } %>
+    <span class="hidden text-red-400 text-sm mt-1" data-account-form-target="nameError"></span>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :account_type, t('accounts.form.account_type'), class: "block text-sm font-semibold text-gray-300 mb-2" %>
+    <%= f.select :account_type,
+        account_type_options,
+        { prompt: t('accounts.form.account_type_prompt') },
+        {
+          required: true,
+          disabled: account.persisted?,
+          class: "w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600 #{'opacity-50 cursor-not-allowed' if account.persisted?}"
+        } %>
+    <% if account.persisted? %>
+      <small class="text-gray-400 text-sm mt-1 block"><%= t('accounts.form.type_immutable_notice') %></small>
+    <% end %>
+  </div>
+
+  <div class="mb-6">
+    <%= f.label :initial_balance, t('accounts.form.initial_balance'), class: "block text-sm font-semibold text-gray-300 mb-2" %>
+    <%= f.text_field :initial_balance,
+        value: account.persisted? ? number_to_currency(account.initial_balance, unit: '', delimiter: '.', separator: ',') : '',
+        placeholder: t('accounts.form.initial_balance_placeholder'),
+        class: "w-full bg-slate-900 border border-slate-700 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600",
+        data: {
+          account_form_target: "balance",
+          action: "input->account-form#formatCurrency blur->account-form#validateBalance"
+        } %>
+    <span class="hidden text-red-400 text-sm mt-1" data-account-form-target="balanceError"></span>
+    <small class="text-gray-400 text-sm mt-1 block"><%= t('accounts.form.initial_balance_help') %></small>
+  </div>
+
+  <div class="flex space-x-3">
+    <%= f.submit account.persisted? ? t('accounts.form.submit_update') : t('accounts.form.submit_create'),
+        class: "flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded cursor-pointer" %>
+    <%= link_to t('accounts.form.cancel'),
+        account.persisted? ? account_path(account) : accounts_path,
+        class: "flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded text-center" %>
+  </div>
+<% end %>

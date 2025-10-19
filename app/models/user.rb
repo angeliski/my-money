@@ -5,6 +5,10 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   after_invitation_accepted :updated_status_after_accept_invitation
 
+  # Associations
+  belongs_to :family
+  has_many :accounts, through: :family
+
   # usando essas roles fixas por hora
   enum :role, {
     admin: "Administrador",
@@ -18,8 +22,17 @@ class User < ApplicationRecord
     invited: "Convidado"
   }, suffix: true, default: :invited
 
+  # Callbacks
+  before_validation :create_family_if_needed, on: :create
+
   def updated_status_after_accept_invitation
     self.status = :active
     save!
+  end
+
+  private
+
+  def create_family_if_needed
+    self.family ||= Family.create!
   end
 end

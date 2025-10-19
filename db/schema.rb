@@ -10,11 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_08_220802) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_18_224930) do
+  create_table "accounts", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "account_type", default: 0, null: false
+    t.integer "initial_balance_cents", default: 0, null: false
+    t.string "icon", null: false
+    t.string "color", null: false
+    t.datetime "archived_at"
+    t.integer "family_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["archived_at"], name: "index_accounts_on_archived_at"
+    t.index ["created_at"], name: "index_accounts_on_created_at"
+    t.index ["family_id", "archived_at"], name: "index_accounts_on_family_id_and_archived_at"
+    t.index ["family_id"], name: "index_accounts_on_family_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "families", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_families_on_created_at"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -46,10 +68,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_220802) do
     t.integer "invited_by_id"
     t.integer "invitations_count", default: 0
     t.string "status"
+    t.integer "family_id", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["family_id"], name: "index_users_on_family_id"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "accounts", "families"
+  add_foreign_key "users", "families"
 end

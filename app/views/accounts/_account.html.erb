@@ -1,0 +1,40 @@
+<%
+  archived ||= false
+  wrapper_id = archived ? "archived-#{dom_id(account)}" : dom_id(account)
+%>
+
+<div id="<%= wrapper_id %>" class="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-cyan-600 transition">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <span class="text-3xl"><%= account.icon %></span>
+      <div>
+        <h3 class="text-lg font-semibold text-white"><%= account.name %></h3>
+        <span class="text-sm text-gray-400"><%= account.account_type.humanize %></span>
+      </div>
+    </div>
+
+    <div class="text-right">
+      <p class="text-2xl font-bold <%= balance_class(account) %>">
+        <%= format_balance(account) %>
+      </p>
+      <div class="mt-2 space-x-2">
+        <%= link_to t('accounts.actions.view'), account_path(account),
+            class: "text-cyan-400 hover:text-cyan-300 text-sm" %>
+        <% unless account.archived? %>
+          <%= link_to t('accounts.actions.edit'), edit_account_path(account),
+              class: "text-cyan-400 hover:text-cyan-300 text-sm" %>
+          <%= link_to t('accounts.actions.archive'), archive_account_path(account),
+              data: {
+                turbo_method: :delete,
+                turbo_confirm: t('accounts.archive.confirm')
+              },
+              class: "text-red-400 hover:text-red-300 text-sm" %>
+        <% else %>
+          <%= link_to t('accounts.actions.unarchive'), unarchive_account_path(account),
+              data: { turbo_method: :patch },
+              class: "text-green-400 hover:text-green-300 text-sm" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

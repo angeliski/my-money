@@ -48,7 +48,14 @@
       "Bash(bin/check)",
       "Bash(bundle exec brakeman -q)",
       "Bash(bundle exec brakeman -I)",
-      "Bash(bundle exec brakeman -f json)"
+      "Bash(bundle exec brakeman -f json)",
+      "Bash(if [ -d \"/home/angeliski/workspace/my-money/specs/001-account-management/checklists\" ])",
+      "Bash(then ls -1 \"/home/angeliski/workspace/my-money/specs/001-account-management/checklists/\"*.md)",
+      "Bash(else echo \"NO_CHECKLISTS\")",
+      "Bash(fi)",
+      "Bash(bundle exec rails generate:*)",
+      "Bash(bundle exec rails db:migrate)",
+      "Bash(bundle exec rails db:test:prepare)"
     ],
     "deny": [],
     "ask": []
