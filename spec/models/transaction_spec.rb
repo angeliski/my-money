@@ -32,11 +32,12 @@ RSpec.describe Transaction, type: :model do
         expect(transaction.errors[:frequency]).to be_present
       end
 
-      it "requires start_date" do
-        transaction = build(:transaction, is_template: true, frequency: "monthly")
+      it "automatically sets start_date from transaction_date if not provided" do
+        transaction = build(:transaction, is_template: true, frequency: "monthly", transaction_date: Date.current)
         transaction.start_date = nil
-        expect(transaction).not_to be_valid
-        expect(transaction.errors[:start_date]).to be_present
+        expect(transaction).to be_valid
+        transaction.valid? # Trigger callbacks
+        expect(transaction.start_date).to eq(Date.current)
       end
     end
 

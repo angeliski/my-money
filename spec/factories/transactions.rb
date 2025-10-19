@@ -1,8 +1,6 @@
 FactoryBot.define do
   factory :transaction do
-    association :account
     association :category
-    association :user
 
     transaction_type { 'expense' }
     amount_cents { 15_000 } # R$ 150.00
@@ -10,6 +8,22 @@ FactoryBot.define do
     transaction_date { Date.current }
     description { 'Test transaction' }
     is_template { false }
+
+    # Ensure user and account belong to the same family
+    after(:build) do |transaction, evaluator|
+      if transaction.account.present? && transaction.user.nil?
+        # If account is provided but user is not, create user in same family
+        transaction.user = create(:user, family: transaction.account.family)
+      elsif transaction.user.present? && transaction.account.nil?
+        # If user is provided but account is not, create account in same family
+        transaction.account = create(:account, family: transaction.user.family)
+      elsif transaction.user.nil? && transaction.account.nil?
+        # If neither is provided, create both in same family
+        family = create(:family)
+        transaction.user = create(:user, family: family)
+        transaction.account = create(:account, family: family)
+      end
+    end
 
     trait :income do
       transaction_type { 'income' }

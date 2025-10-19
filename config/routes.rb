@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :transfers, only: [:new, :create]
+  resources :transfers, only: [ :new, :create ]
 
   resources :categories
   devise_for :users

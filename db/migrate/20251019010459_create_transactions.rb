@@ -34,6 +34,6 @@ class CreateTransactions < ActiveRecord::Migration[7.2]
     # Performance indexes (references already create indexes for foreign keys)
     add_index :transactions, :transaction_date
     add_index :transactions, :transaction_type
-    add_index :transactions, [:is_template, :parent_transaction_id]
+    add_index :transactions, [ :is_template, :parent_transaction_id ]
   end
 end

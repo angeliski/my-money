@@ -107,6 +107,7 @@ class Transaction < ApplicationRecord
   # Category/Account active validations
   validate :category_not_archived
   validate :account_not_archived
+  validate :account_belongs_to_user_family
 
   # Callbacks
   before_validation :set_start_date_from_transaction_date, if: :is_template?
@@ -177,6 +178,12 @@ class Transaction < ApplicationRecord
     return unless account
 
     errors.add(:account, "está arquivada") if account.archived?
+  end
+
+  def account_belongs_to_user_family
+    return unless account && user
+
+    errors.add(:account, "não pertence à sua família") if account.family_id != user.family_id
   end
 
   def recalculate_account_balance
