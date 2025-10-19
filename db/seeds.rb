@@ -11,18 +11,35 @@ if Rails.env.development?
     user.status = :active
   end
 
-  # Categories
-  categories = [
-    "Comida",
-    "Transporte",
-    "Moradia",
-    "Saúde",
-    "Entretenimento",
-    "Transferência"  # Required for transaction transfers
+  # Categories - Despesas (Expenses)
+  expense_categories = [
+    { name: "Moradia", icon: "🏠", category_type: "expense" },
+    { name: "Contas", icon: "💡", category_type: "expense" },
+    { name: "Alimentação", icon: "🍔", category_type: "expense" },
+    { name: "Transporte", icon: "🚗", category_type: "expense" },
+    { name: "Saúde", icon: "🏥", category_type: "expense" },
+    { name: "Educação", icon: "📚", category_type: "expense" },
+    { name: "Lazer", icon: "🎮", category_type: "expense" },
+    { name: "Vestuário", icon: "👕", category_type: "expense" },
+    { name: "Pets", icon: "🐕", category_type: "expense" },
+    { name: "Outros Despesas", icon: "💸", category_type: "expense" },
+    { name: "Transferência", icon: "↔️", category_type: "transfer" }  # Required for transfers
   ]
 
-  categories.each do |category_name|
-    Category.find_or_create_by!(name: category_name)
+  # Categories - Receitas (Income)
+  income_categories = [
+    { name: "Salário", icon: "💼", category_type: "income" },
+    { name: "Freelance", icon: "💻", category_type: "income" },
+    { name: "Rendimentos", icon: "📈", category_type: "income" },
+    { name: "Presentes", icon: "🎁", category_type: "income" },
+    { name: "Outros Receitas", icon: "💵", category_type: "income" }
+  ]
+
+  (expense_categories + income_categories).each do |category_data|
+    Category.find_or_create_by!(name: category_data[:name]) do |category|
+      category.icon = category_data[:icon]
+      category.category_type = category_data[:category_type]
+    end
   end
 
   # Accounts for admin user's family

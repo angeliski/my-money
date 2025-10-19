@@ -12,12 +12,15 @@
   <div class="space-y-4">
     <div>
       <%= f.label :transaction_type, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
-      <div class="flex gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <%= f.radio_button :transaction_type, "income", class: "hidden peer/income", data: { action: "change->transaction-form#toggleType" } %>
-        <%= f.label :transaction_type_income, "Receita", class: "flex-1 text-center py-2 px-4 rounded-lg cursor-pointer bg-slate-700 peer-checked/income:bg-green-600 peer-checked/income:text-white" %>
+        <%= f.label :transaction_type_income, "Receita", class: "text-center py-2 px-3 rounded-lg cursor-pointer bg-slate-700 peer-checked/income:bg-green-600 peer-checked/income:text-white text-sm" %>
 
         <%= f.radio_button :transaction_type, "expense", class: "hidden peer/expense", checked: transaction.expense?, data: { action: "change->transaction-form#toggleType" } %>
-        <%= f.label :transaction_type_expense, "Despesa", class: "flex-1 text-center py-2 px-4 rounded-lg cursor-pointer bg-slate-700 peer-checked/expense:bg-red-600 peer-checked/expense:text-white" %>
+        <%= f.label :transaction_type_expense, "Despesa", class: "text-center py-2 px-3 rounded-lg cursor-pointer bg-slate-700 peer-checked/expense:bg-red-600 peer-checked/expense:text-white text-sm" %>
+
+        <%= f.radio_button :transaction_type, "transfer", class: "hidden peer/transfer", data: { action: "change->transaction-form#toggleType" } %>
+        <%= f.label :transaction_type_transfer, "Transferência", class: "text-center py-2 px-3 rounded-lg cursor-pointer bg-slate-700 peer-checked/transfer:bg-purple-600 peer-checked/transfer:text-white text-sm" %>
       </div>
     </div>
 
@@ -40,11 +43,30 @@
           { required: true, class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
     </div>
 
-    <div>
+    <!-- Campo de Conta para Income/Expense -->
+    <div data-transaction-form-target="accountField">
       <%= f.label :account_id, "Conta", class: "block text-sm font-medium text-slate-300 mb-1" %>
       <%= f.collection_select :account_id, current_user.family.accounts.active, :id, :name,
           { prompt: "Selecione uma conta" },
           { required: true, class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
+    </div>
+
+    <!-- Campos para Transfer -->
+    <div data-transaction-form-target="transferFields" class="hidden space-y-4">
+      <div>
+        <%= f.label :account_id, "Conta Origem", class: "block text-sm font-medium text-slate-300 mb-1" %>
+        <%= f.collection_select :account_id, current_user.family.accounts.active, :id, :name,
+            { prompt: "Selecione a conta origem" },
+            { class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2", disabled: true } %>
+      </div>
+      <div>
+        <%= label_tag :destination_account_id, "Conta Destino", class: "block text-sm font-medium text-slate-300 mb-1" %>
+        <%= select_tag :destination_account_id,
+            options_from_collection_for_select(current_user.family.accounts.active, :id, :name),
+            prompt: "Selecione a conta destino",
+            class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2",
+            disabled: true %>
+      </div>
     </div>
 
     <div>
@@ -53,7 +75,7 @@
           class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
     </div>
 
-    <div data-transaction-form-target="recurringFields" class="hidden">
+    <div data-transaction-form-target="recurringFields">
       <div class="border-t border-slate-600 pt-4 mt-4">
         <label class="flex items-center gap-2 text-slate-300 mb-4">
           <%= f.check_box :is_template, class: "rounded", data: { action: "change->transaction-form#toggleRecurring" } %>
@@ -73,12 +95,6 @@
                 ]),
                 { prompt: "Selecione" },
                 { class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
-          </div>
-
-          <div>
-            <%= f.label :start_date, "Data de início", class: "block text-sm font-medium text-slate-300 mb-1" %>
-            <%= f.date_field :start_date,
-                class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
           </div>
 
           <div>

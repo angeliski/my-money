@@ -96,8 +96,7 @@ class Transaction < ApplicationRecord
 
   # Template-specific validations
   validates :frequency, presence: true, if: :is_template?
-  validates :start_date, presence: true, if: :is_template?
-  validates :end_date, comparison: { greater_than: :start_date }, allow_nil: true, if: :is_template?
+  validates :end_date, comparison: { greater_than: :transaction_date }, allow_nil: true, if: :is_template?
 
   # Non-template validations
   validates :frequency, absence: true, unless: :is_template?
@@ -110,6 +109,7 @@ class Transaction < ApplicationRecord
   validate :account_not_archived
 
   # Callbacks
+  before_validation :set_start_date_from_transaction_date, if: :is_template?
   after_save :recalculate_account_balance
   after_destroy :recalculate_account_balance
   after_save :regenerate_future_transactions, if: :saved_change_to_template_attributes?
@@ -162,6 +162,10 @@ class Transaction < ApplicationRecord
   end
 
   private
+
+  def set_start_date_from_transaction_date
+    self.start_date = transaction_date if start_date.blank?
+  end
 
   def category_not_archived
     return unless category

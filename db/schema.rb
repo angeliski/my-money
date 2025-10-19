@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_19_010711) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_19_023149) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.integer "account_type", default: 0, null: false
@@ -32,6 +32,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_19_010711) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "icon", default: "💰"
+    t.string "category_type", default: "expense"
   end
 
   create_table "families", force: :cascade do |t|
