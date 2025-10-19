@@ -1,6 +1,7 @@
 class Account < ApplicationRecord
   # Associations
   belongs_to :family
+  has_many :transactions, dependent: :restrict_with_error
 
   # Enums
   enum :account_type, { checking: 0, investment: 1 }
@@ -15,6 +16,7 @@ class Account < ApplicationRecord
 
   # Money-rails integration
   monetize :initial_balance_cents, with_model_currency: :currency
+  monetize :balance_cents, with_model_currency: :currency
 
   # Scopes
   scope :active, -> { where(archived_at: nil) }
@@ -23,11 +25,12 @@ class Account < ApplicationRecord
 
   # Callbacks
   before_validation :set_icon_and_color, on: :create
+  before_create :initialize_balance
 
   # Instance methods
   def current_balance
-    # For now, return initial balance (transactions will be implemented in future phase)
-    Money.new(initial_balance_cents, "BRL")
+    # Return calculated balance from transactions
+    Money.new(balance_cents, "BRL")
   end
 
   def positive_balance?
@@ -65,5 +68,9 @@ class Account < ApplicationRecord
       self.icon ||= "📈"
       self.color ||= "#10B981"
     end
+  end
+
+  def initialize_balance
+    self.balance_cents = initial_balance_cents
   end
 end

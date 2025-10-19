@@ -1,0 +1,15 @@
+<%= turbo_frame_tag "transaction_modal" do %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" data-controller="modal">
+    <div class="bg-slate-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" data-modal-target="content">
+      <h2 class="text-2xl font-bold text-slate-100 mb-4">Nova Transferência</h2>
+
+      <% if defined?(error) && error.present? %>
+        <div class="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-4">
+          <%= error %>
+        </div>
+      <% end %>
+
+      <%= render "form" %>
+    </div>
+  </div>
+<% end %>

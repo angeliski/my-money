@@ -1,0 +1,47 @@
+<%= form_with(scope: :transfer, url: transfers_path, class: "space-y-4") do |f| %>
+  <div>
+    <%= f.label :from_account_id, "Conta Origem", class: "block text-sm font-medium text-slate-300 mb-1" %>
+    <%= f.select :from_account_id,
+        options_from_collection_for_select(@accounts, :id, :name),
+        { prompt: "Selecione a conta de origem" },
+        required: true,
+        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  </div>
+
+  <div>
+    <%= f.label :to_account_id, "Conta Destino", class: "block text-sm font-medium text-slate-300 mb-1" %>
+    <%= f.select :to_account_id,
+        options_from_collection_for_select(@accounts, :id, :name),
+        { prompt: "Selecione a conta de destino" },
+        required: true,
+        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  </div>
+
+  <div>
+    <%= f.label :amount, "Valor", class: "block text-sm font-medium text-slate-300 mb-1" %>
+    <%= f.number_field :amount, step: 0.01, min: 0.01, required: true,
+        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  </div>
+
+  <div>
+    <%= f.label :transaction_date, "Data", class: "block text-sm font-medium text-slate-300 mb-1" %>
+    <%= f.date_field :transaction_date, value: Date.current, required: true,
+        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descrição", class: "block text-sm font-medium text-slate-300 mb-1" %>
+    <%= f.text_field :description, required: true,
+        class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+  </div>
+
+  <div class="flex gap-3 justify-end pt-4">
+    <button type="button"
+        data-action="click->modal#close"
+        class="px-4 py-2 text-slate-300 hover:text-slate-100">
+      Cancelar
+    </button>
+    <%= f.submit "Criar Transferência",
+        class: "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg" %>
+  </div>
+<% end %>

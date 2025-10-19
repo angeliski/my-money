@@ -1,0 +1,28 @@
+<div id="transactions_list" class="space-y-4">
+  <% if transactions.any? %>
+    <% transactions.group_by(&:transaction_date).each do |date, day_transactions| %>
+      <% day_total = day_transactions.sum { |t| t.income? ? t.amount_cents : -t.amount_cents } %>
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <div class="text-sm font-medium text-slate-300">
+            <%= format_day_header(date) %>
+          </div>
+          <div class="text-sm font-semibold <%= day_total >= 0 ? 'text-green-400' : 'text-red-400' %>">
+            <%= number_to_currency(day_total / 100.0, unit: 'R$ ', precision: 0) %>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <% day_transactions.each do |transaction| %>
+            <%= render "transaction", transaction: transaction %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center text-slate-400 py-12">
+      <div class="text-6xl mb-4">📊</div>
+      <div class="text-lg font-medium mb-2">Nenhuma transação encontrada</div>
+      <div class="text-sm text-slate-500">Tente ajustar os filtros ou adicione uma nova transação</div>
+    </div>
+  <% end %>
+</div>
