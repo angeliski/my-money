@@ -1,12 +1,20 @@
 <%= form_with url: transactions_path, method: :get,
     data: { turbo_frame: "transactions_list", controller: "filter", action: "input->filter#submit" } do |f| %>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
     <div>
       <%= f.label :type, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
       <%= f.select :type,
           [['Todas', ''], ['Receita', 'income'], ['Despesa', 'expense']],
           { selected: params[:type] },
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
+    </div>
+
+    <div>
+      <%= f.label :status, "Status", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.select :status,
+          [['Todas', ''], ['Realizada', 'effectuated'], ['Pendente', 'pending']],
+          { selected: params[:status] },
           class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
     </div>
 

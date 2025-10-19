@@ -1,7 +1,7 @@
 class Transaction < ApplicationRecord
   # Enums
-  enum transaction_type: { income: "income", expense: "expense" }
-  enum frequency: {
+  enum :transaction_type, { income: "income", expense: "expense" }
+  enum :frequency, {
     monthly: "monthly",
     bimonthly: "bimonthly",
     quarterly: "quarterly",
@@ -19,7 +19,7 @@ class Transaction < ApplicationRecord
   belongs_to :editor, class_name: "User", optional: true
   belongs_to :parent_transaction, class_name: "Transaction", optional: true
   belongs_to :linked_transaction, class_name: "Transaction", optional: true
-  has_many :children, class_name: "Transaction", foreign_key: :parent_transaction_id, dependent: :destroy
+  has_many :children, class_name: "Transaction", foreign_key: :parent_transaction_id, dependent: false
 
   # Scopes - Type scopes
   scope :income_transactions, -> { where(transaction_type: "income") }
@@ -102,7 +102,9 @@ class Transaction < ApplicationRecord
   after_save :recalculate_account_balance
   after_destroy :recalculate_account_balance
   after_save :regenerate_future_transactions, if: :saved_change_to_template_attributes?
-  before_update :set_editor, if: :will_save_change_to_any_attribute?
+  before_update :set_editor
+  before_update :unlink_from_template_if_manually_edited
+  before_destroy :destroy_pending_children_if_template
   before_destroy :destroy_linked_transaction_if_transfer
 
   # Business methods - Effectuation
@@ -196,5 +198,32 @@ class Transaction < ApplicationRecord
     linked = linked_transaction
     update_column(:linked_transaction_id, nil)
     linked.destroy if linked.persisted?
+  end
+
+  def unlink_from_template_if_manually_edited
+    # Only for generated transactions (not templates themselves)
+    return if is_template? || parent_transaction_id.nil?
+
+    # Check if any significant attribute changed (using will_save_change for before_update)
+    manual_edit = will_save_change_to_amount_cents? ||
+                  will_save_change_to_description? ||
+                  will_save_change_to_category_id? ||
+                  will_save_change_to_transaction_date? ||
+                  will_save_change_to_account_id?
+
+    # Unlink from template if manually edited
+    self.parent_transaction_id = nil if manual_edit
+  end
+
+  def destroy_pending_children_if_template
+    return unless is_template?
+
+    # Destroy only pending children (future date, not manually marked as paid)
+    # This matches User Story 5 requirement: keep effectuated transactions when template is deleted
+    children.pending.where(effectuated_at: nil).destroy_all
+
+    # Nullify parent_transaction_id for remaining children (effectuated and manually marked)
+    # This allows the template to be deleted without foreign key constraint violations
+    children.update_all(parent_transaction_id: nil)
   end
 end
