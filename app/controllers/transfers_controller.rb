@@ -44,6 +44,7 @@ class TransfersController < ApplicationController
       format.html { redirect_to transactions_path, notice: "Transferência criada com sucesso." }
     end
   rescue ArgumentError => e
+    @accounts = current_user.family.accounts.active.ordered_by_creation
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("transaction_modal",

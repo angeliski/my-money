@@ -8,6 +8,7 @@ class TransactionsController < ApplicationController
 
     @transactions = current_user.family.transactions
                                 .includes(:account, :category, :user)
+                                .where(is_template: false)
                                 .apply_filters(filter_params)
 
     # Apply month filter if no custom period specified
@@ -51,6 +52,7 @@ class TransactionsController < ApplicationController
         @month = params[:month] || Date.current.strftime("%Y-%m")
         transactions_for_totals = current_user.family.transactions
                                               .includes(:account, :category)
+                                              .where(is_template: false)
                                               .by_month(@month)
         @totals = calculate_totals(transactions_for_totals)
 
@@ -94,6 +96,7 @@ class TransactionsController < ApplicationController
         @month = params[:month] || Date.current.strftime("%Y-%m")
         transactions_for_totals = current_user.family.transactions
                                               .includes(:account, :category)
+                                              .where(is_template: false)
                                               .by_month(@month)
         @totals = calculate_totals(transactions_for_totals)
 
@@ -131,6 +134,7 @@ class TransactionsController < ApplicationController
     @month = params[:month] || Date.current.strftime("%Y-%m")
     transactions_for_totals = current_user.family.transactions
                                           .includes(:account, :category)
+                                          .where(is_template: false)
                                           .by_month(@month)
     @totals = calculate_totals(transactions_for_totals)
 

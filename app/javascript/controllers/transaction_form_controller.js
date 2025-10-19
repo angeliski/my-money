@@ -9,6 +9,15 @@ export default class extends Controller {
   }
 
   toggleType(event) {
+    const selectedType = this.element.querySelector('input[name="transaction[transaction_type]"]:checked')?.value
+
+    // Se transferência foi selecionada, redirecionar para o formulário de transferência
+    if (selectedType === "transfer") {
+      // Usar Turbo para navegação sem recarregar a página
+      Turbo.visit("/transfers/new")
+      return
+    }
+
     this.updateAccountFields()
   }
 
