@@ -1,0 +1,36 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-white"><%= t('.title') %></h1>
+    <%= link_to t('.new_account'), new_account_path,
+        class: "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded transition" %>
+  </div>
+
+  <%= render partial: "accounts/total" %>
+
+  <% if @accounts.empty? %>
+    <div id="empty-state" class="bg-slate-800 border border-slate-700 rounded-lg p-12 text-center">
+      <p class="text-gray-400 text-lg mb-2"><%= t('.empty_state') %></p>
+      <p class="text-gray-500 text-sm mb-6"><%= t('.empty_state_subtitle') %></p>
+      <%= link_to t('.new_account'), new_account_path,
+          class: "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded inline-block transition" %>
+    </div>
+  <% else %>
+    <div id="accounts-list" class="space-y-4">
+      <%= render @accounts %>
+    </div>
+  <% end %>
+
+  <% if @archived_accounts.present? %>
+    <div id="archived-accounts-section" class="mt-8">
+      <h2 class="text-xl font-bold text-white mb-4"><%= t('.archived_title') %></h2>
+      <div id="archived-accounts-list" class="space-y-4 opacity-60">
+        <%= render partial: "accounts/account", collection: @archived_accounts, locals: { archived: true } %>
+      </div>
+    </div>
+  <% elsif current_user.family.accounts.archived.any? %>
+    <div class="mt-8 text-center">
+      <%= link_to t('.show_archived'), accounts_path(show_archived: true),
+          class: "text-cyan-400 hover:text-cyan-300 text-sm" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,68 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <%= link_to t('.back'), accounts_path, class: "text-cyan-400 hover:text-cyan-300 text-sm" %>
+  </div>
+
+  <div class="bg-slate-800 border border-slate-700 rounded-lg p-8">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center space-x-4">
+        <span class="text-5xl"><%= @account.icon %></span>
+        <div>
+          <h1 class="text-3xl font-bold text-white"><%= @account.name %></h1>
+          <span class="text-gray-400"><%= @account.account_type.humanize %></span>
+        </div>
+      </div>
+
+      <div class="text-right">
+        <p class="text-sm text-gray-400 mb-1">Saldo Atual</p>
+        <p class="text-4xl font-bold <%= balance_class(@account) %>">
+          <%= format_balance(@account) %>
+        </p>
+      </div>
+    </div>
+
+    <div class="border-t border-slate-700 pt-6 mt-6">
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-gray-400">Saldo Inicial</dt>
+          <dd class="text-lg text-white"><%= number_to_currency(Money.new(@account.initial_balance_cents, 'BRL'), locale: :'pt-BR') %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-400">Tipo</dt>
+          <dd class="text-lg text-white"><%= @account.type_with_icon %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-400">Criada em</dt>
+          <dd class="text-lg text-white"><%= l(@account.created_at, format: :long) %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-gray-400">Status</dt>
+          <dd class="text-lg text-white">
+            <% if @account.archived? %>
+              <span class="text-red-400">Arquivada em <%= l(@account.archived_at, format: :short) %></span>
+            <% else %>
+              <span class="text-green-400">Ativa</span>
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="mt-6 space-x-3">
+      <% unless @account.archived? %>
+        <%= link_to t('.edit'), edit_account_path(@account),
+            class: "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded inline-block" %>
+        <%= link_to t('.archive'), archive_account_path(@account),
+            data: {
+              turbo_method: :delete,
+              turbo_confirm: t('accounts.archive.confirm')
+            },
+            class: "bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded inline-block" %>
+      <% else %>
+        <%= link_to t('accounts.actions.unarchive'), unarchive_account_path(@account),
+            data: { turbo_method: :patch },
+            class: "bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded inline-block" %>
+      <% end %>
+    </div>
+  </div>
+</div>
