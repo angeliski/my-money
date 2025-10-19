@@ -1,0 +1,20 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-slate-700 rounded-lg p-4">
+    <div class="text-sm text-slate-400">Total de transações</div>
+    <div class="text-2xl font-bold text-slate-100"><%= totals[:count] %></div>
+  </div>
+
+  <div class="bg-slate-700 rounded-lg p-4">
+    <div class="text-sm text-slate-400">Receitas</div>
+    <div class="text-2xl font-bold text-green-400">
+      <%= number_to_currency(totals[:income] / 100.0, unit: 'R$ ') %>
+    </div>
+  </div>
+
+  <div class="bg-slate-700 rounded-lg p-4">
+    <div class="text-sm text-slate-400">Despesas</div>
+    <div class="text-2xl font-bold text-red-400">
+      <%= number_to_currency(totals[:expense] / 100.0, unit: 'R$ ') %>
+    </div>
+  </div>
+</div>

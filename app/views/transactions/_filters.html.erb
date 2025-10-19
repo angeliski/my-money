@@ -1,0 +1,40 @@
+<%= form_with url: transactions_path, method: :get,
+    data: { turbo_frame: "transactions_list", controller: "filter", action: "input->filter#submit" } do |f| %>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div>
+      <%= f.label :type, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.select :type,
+          [['Todas', ''], ['Receita', 'income'], ['Despesa', 'expense']],
+          { selected: params[:type] },
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
+    </div>
+
+    <div>
+      <%= f.label :category_id, "Categoria", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.select :category_id,
+          options_from_collection_for_select(@categories, :id, :name, params[:category_id]),
+          { include_blank: 'Todas' },
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
+    </div>
+
+    <div>
+      <%= f.label :account_id, "Conta", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.select :account_id,
+          options_from_collection_for_select(@accounts, :id, :name, params[:account_id]),
+          { include_blank: 'Todas' },
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg" %>
+    </div>
+
+    <div>
+      <%= f.label :search, "Buscar", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.text_field :search,
+          value: params[:search],
+          placeholder: "Descrição...",
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg",
+          data: { action: "input->filter#debounceSubmit" } %>
+    </div>
+  </div>
+
+  <%= f.hidden_field :month, value: @month %>
+<% end %>

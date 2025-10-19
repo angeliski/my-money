@@ -1,0 +1,20 @@
+<div id="transactions_list" class="space-y-2">
+  <% if transactions.any? %>
+    <% transactions.group_by(&:transaction_date).each do |date, day_transactions| %>
+      <div class="mb-4">
+        <div class="text-sm font-medium text-slate-400 mb-2">
+          <%= format_day_header(date) %>
+        </div>
+        <div class="space-y-2">
+          <% day_transactions.each do |transaction| %>
+            <%= render "transaction", transaction: transaction %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center text-slate-400 py-12">
+      Nenhuma transação encontrada para este período.
+    </div>
+  <% end %>
+</div>

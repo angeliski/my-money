@@ -1,4 +1,13 @@
 Rails.application.routes.draw do
+  resources :transactions do
+    member do
+      post :mark_as_paid
+      delete :mark_as_paid, action: :unmark_as_paid
+    end
+  end
+
+  resources :transfers, only: [:new, :create]
+
   resources :categories
   devise_for :users
 

@@ -280,6 +280,8 @@ Criar um aplicativo mobile de controle financeiro pessoal que permita famílias 
 - Pull-to-refresh nas listagens
 - Skeleton screens durante carregamento
 
+A pasta docs/ux contém referências visuais e protótipos de telas que devem ser levados em consideração.
+
 #### 3.1.3 Fluxos Intuitivos
 - Onboarding simplificado (3-4 telas máximo)
 - Cadastro de transação em no máximo 2 telas

@@ -17,7 +17,8 @@ if Rails.env.development?
     "Transporte",
     "Moradia",
     "Saúde",
-    "Entretenimento"
+    "Entretenimento",
+    "Transferência"  # Required for transaction transfers
   ]
 
   categories.each do |category_name|

@@ -1,0 +1,200 @@
+class Transaction < ApplicationRecord
+  # Enums
+  enum transaction_type: { income: "income", expense: "expense" }
+  enum frequency: {
+    monthly: "monthly",
+    bimonthly: "bimonthly",
+    quarterly: "quarterly",
+    semiannual: "semiannual",
+    annual: "annual"
+  }
+
+  # Money
+  monetize :amount_cents
+
+  # Associations
+  belongs_to :account
+  belongs_to :category
+  belongs_to :user
+  belongs_to :editor, class_name: "User", optional: true
+  belongs_to :parent_transaction, class_name: "Transaction", optional: true
+  belongs_to :linked_transaction, class_name: "Transaction", optional: true
+  has_many :children, class_name: "Transaction", foreign_key: :parent_transaction_id, dependent: :destroy
+
+  # Scopes - Type scopes
+  scope :income_transactions, -> { where(transaction_type: "income") }
+  scope :expense_transactions, -> { where(transaction_type: "expense") }
+
+  # Scopes - Template scopes
+  scope :templates, -> { where(is_template: true) }
+  scope :one_time, -> { where(is_template: false, parent_transaction_id: nil) }
+  scope :generated_from_template, -> { where.not(parent_transaction_id: nil) }
+
+  # Scopes - Effectuation scopes (timezone-aware)
+  scope :effectuated, lambda {
+    tz = Time.find_zone("America/Sao_Paulo")
+    where("effectuated_at IS NOT NULL OR transaction_date <= ?", tz.now.to_date)
+  }
+  scope :pending, lambda {
+    tz = Time.find_zone("America/Sao_Paulo")
+    where("effectuated_at IS NULL AND transaction_date > ?", tz.now.to_date)
+  }
+
+  # Scopes - Transfer scopes
+  scope :transfers, -> { joins(:category).where(categories: { name: "Transferência" }) }
+
+  # Scopes - Date scopes
+  scope :by_month, lambda { |month_string|
+    date = Date.parse(month_string)
+    where(transaction_date: date.beginning_of_month..date.end_of_month)
+  }
+  scope :in_period, ->(start_date, end_date) { where(transaction_date: start_date..end_date) }
+
+  # Scopes - Filtering scope
+  scope :apply_filters, lambda { |filters|
+    result = all
+    result = result.where(transaction_type: filters[:type]) if filters[:type].present?
+    result = result.where(category_id: filters[:category_id]) if filters[:category_id].present?
+    result = result.where(account_id: filters[:account_id]) if filters[:account_id].present?
+    result = result.where("description ILIKE ?", "%#{filters[:search]}%") if filters[:search].present?
+
+    if filters[:status] == "effectuated"
+      result = result.effectuated
+    elsif filters[:status] == "pending"
+      result = result.pending
+    end
+
+    if filters[:period_start].present? && filters[:period_end].present?
+      result = result.in_period(filters[:period_start], filters[:period_end])
+    end
+
+    result
+  }
+
+  # Validations
+  validates :transaction_type, presence: true, inclusion: { in: transaction_types.keys }
+  validates :amount_cents, presence: true,
+                           numericality: {
+                             only_integer: true,
+                             greater_than: 0,
+                             less_than_or_equal_to: 99_999_999_999
+                           }
+  validates :transaction_date, presence: true
+  validates :description, presence: true, length: { minimum: 3, maximum: 500 }
+  validates :currency, presence: true, inclusion: { in: [ "BRL" ] }
+
+  # Template-specific validations
+  validates :frequency, presence: true, if: :is_template?
+  validates :start_date, presence: true, if: :is_template?
+  validates :end_date, comparison: { greater_than: :start_date }, allow_nil: true, if: :is_template?
+
+  # Non-template validations
+  validates :frequency, absence: true, unless: :is_template?
+  validates :start_date, absence: true, unless: :is_template?
+  validates :end_date, absence: true, unless: :is_template?
+  validates :parent_transaction_id, absence: true, if: :is_template?
+
+  # Category/Account active validations
+  validate :category_not_archived
+  validate :account_not_archived
+
+  # Callbacks
+  after_save :recalculate_account_balance
+  after_destroy :recalculate_account_balance
+  after_save :regenerate_future_transactions, if: :saved_change_to_template_attributes?
+  before_update :set_editor, if: :will_save_change_to_any_attribute?
+  before_destroy :destroy_linked_transaction_if_transfer
+
+  # Business methods - Effectuation
+  def mark_as_paid!
+    return if effectuated?
+
+    update!(effectuated_at: Time.current)
+  end
+
+  def unmark_as_paid!
+    return unless manually_effectuated? && pending_by_date?
+
+    update!(effectuated_at: nil)
+  end
+
+  def effectuated?
+    effectuated_at.present? || transaction_date <= Time.current.in_time_zone("America/Sao_Paulo").to_date
+  end
+
+  def manually_effectuated?
+    effectuated_at.present?
+  end
+
+  def pending_by_date?
+    transaction_date > Time.current.in_time_zone("America/Sao_Paulo").to_date
+  end
+
+  # Business methods - Template operations
+  def template?
+    is_template?
+  end
+
+  def generated?
+    parent_transaction_id.present?
+  end
+
+  # Business methods - Transfer operations
+  def transfer?
+    category&.name == "Transferência"
+  end
+
+  def transfer_pair?
+    linked_transaction_id.present?
+  end
+
+  private
+
+  def category_not_archived
+    return unless category
+
+    errors.add(:category, "está arquivada") if category.respond_to?(:archived?) && category.archived?
+  end
+
+  def account_not_archived
+    return unless account
+
+    errors.add(:account, "está arquivada") if account.archived?
+  end
+
+  def recalculate_account_balance
+    BalanceCalculator.recalculate(account) if account
+  end
+
+  def regenerate_future_transactions
+    return unless is_template?
+
+    TransactionService.regenerate_from_template(self)
+  end
+
+  def saved_change_to_template_attributes?
+    is_template? && (
+      saved_change_to_amount_cents? ||
+      saved_change_to_description? ||
+      saved_change_to_category_id? ||
+      saved_change_to_frequency? ||
+      saved_change_to_start_date? ||
+      saved_change_to_end_date?
+    )
+  end
+
+  def set_editor
+    # Using Current if available, otherwise skip
+    self.editor_id = Current.user&.id if defined?(Current)
+    self.edited_at = Time.current
+  end
+
+  def destroy_linked_transaction_if_transfer
+    return unless transfer_pair? && linked_transaction
+
+    # Avoid infinite loop by temporarily removing the link before destroying
+    linked = linked_transaction
+    update_column(:linked_transaction_id, nil)
+    linked.destroy if linked.persisted?
+  end
+end

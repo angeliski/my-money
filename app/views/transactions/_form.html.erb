@@ -1,0 +1,102 @@
+<%= form_with(model: transaction, data: { controller: "transaction-form" }) do |f| %>
+  <% if transaction.errors.any? %>
+    <div class="bg-red-900 text-red-200 p-3 rounded mb-4">
+      <ul>
+        <% transaction.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <div>
+      <%= f.label :transaction_type, "Tipo", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <div class="flex gap-2">
+        <%= f.radio_button :transaction_type, "income", class: "hidden peer/income", data: { action: "change->transaction-form#toggleType" } %>
+        <%= f.label :transaction_type_income, "Receita", class: "flex-1 text-center py-2 px-4 rounded-lg cursor-pointer bg-slate-700 peer-checked/income:bg-green-600 peer-checked/income:text-white" %>
+
+        <%= f.radio_button :transaction_type, "expense", class: "hidden peer/expense", checked: transaction.expense?, data: { action: "change->transaction-form#toggleType" } %>
+        <%= f.label :transaction_type_expense, "Despesa", class: "flex-1 text-center py-2 px-4 rounded-lg cursor-pointer bg-slate-700 peer-checked/expense:bg-red-600 peer-checked/expense:text-white" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :amount, "Valor", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.number_field :amount, step: 0.01, min: 0.01, required: true,
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+    </div>
+
+    <div>
+      <%= f.label :transaction_date, "Data", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.date_field :transaction_date, required: true,
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+    </div>
+
+    <div>
+      <%= f.label :category_id, "Categoria", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.collection_select :category_id, Category.all.order(:name), :id, :name,
+          { prompt: "Selecione uma categoria" },
+          { required: true, class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
+    </div>
+
+    <div>
+      <%= f.label :account_id, "Conta", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.collection_select :account_id, current_user.family.accounts.active, :id, :name,
+          { prompt: "Selecione uma conta" },
+          { required: true, class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
+    </div>
+
+    <div>
+      <%= f.label :description, "Descrição", class: "block text-sm font-medium text-slate-300 mb-1" %>
+      <%= f.text_area :description, rows: 2, required: true,
+          class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+    </div>
+
+    <div data-transaction-form-target="recurringFields" class="hidden">
+      <div class="border-t border-slate-600 pt-4 mt-4">
+        <label class="flex items-center gap-2 text-slate-300 mb-4">
+          <%= f.check_box :is_template, class: "rounded", data: { action: "change->transaction-form#toggleRecurring" } %>
+          <span>Tornar recorrente</span>
+        </label>
+
+        <div data-transaction-form-target="recurringOptions" class="hidden space-y-4">
+          <div>
+            <%= f.label :frequency, "Frequência", class: "block text-sm font-medium text-slate-300 mb-1" %>
+            <%= f.select :frequency,
+                options_for_select([
+                  ['Mensal', 'monthly'],
+                  ['Bimestral', 'bimonthly'],
+                  ['Trimestral', 'quarterly'],
+                  ['Semestral', 'semiannual'],
+                  ['Anual', 'annual']
+                ]),
+                { prompt: "Selecione" },
+                { class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" } %>
+          </div>
+
+          <div>
+            <%= f.label :start_date, "Data de início", class: "block text-sm font-medium text-slate-300 mb-1" %>
+            <%= f.date_field :start_date,
+                class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+          </div>
+
+          <div>
+            <%= f.label :end_date, "Data de término (opcional)", class: "block text-sm font-medium text-slate-300 mb-1" %>
+            <%= f.date_field :end_date,
+                class: "w-full bg-slate-700 border-slate-600 text-slate-100 rounded-lg px-4 py-2" %>
+            <p class="text-xs text-slate-400 mt-1">Deixe em branco para recorrência indefinida</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <%= f.submit transaction.new_record? ? "Criar Transação" : "Atualizar Transação",
+          class: "flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg" %>
+      <%= link_to "Cancelar", transactions_path,
+          class: "flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg text-center",
+          data: { turbo_frame: "_top" } %>
+    </div>
+  </div>
+<% end %>
