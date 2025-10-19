@@ -76,16 +76,11 @@ class AccountsController < ApplicationController
   end
 
   def convert_balance_to_cents(permitted)
-    if permitted[:initial_balance].present?
-      # Remove espaços e pontos (separadores de milhares)
-      balance_str = permitted[:initial_balance].to_s.strip.gsub(".", "")
-      # Converte vírgula em ponto para fazer parse
-      balance_str = balance_str.gsub(",", ".")
-      # Converte para float e depois para centavos
-      balance_float = balance_str.to_f
-      permitted[:initial_balance_cents] = (balance_float * 100).round
-      permitted.delete(:initial_balance)
-    end
+    # O valor já vem em centavos do money-input controller JavaScript
+    # Apenas converte para inteiro e atribui a initial_balance_cents
+    cents_value = permitted[:initial_balance].to_s.strip
+    permitted[:initial_balance_cents] = cents_value.present? ? cents_value.to_i : 0
+    permitted.delete(:initial_balance)
     permitted
   end
 end
