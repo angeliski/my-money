@@ -41,7 +41,7 @@ gem "prawn-table"         # PDF tables
 gem "pagy", "~> 9.0"
 
 # Audit trail for tracking changes
-gem "paper_trail", "~> 16.0"
+gem "paper_trail", "~> 17.0"
 
 # Money handling for financial transactions
 gem "money-rails", "~> 1.15"
