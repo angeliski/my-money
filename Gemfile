@@ -38,7 +38,7 @@ gem "prawn"               # PDF export
 gem "prawn-table"         # PDF tables
 
 # Pagination
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.0"
 
 # Audit trail for tracking changes
 gem "paper_trail", "~> 16.0"
